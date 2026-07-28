@@ -1,0 +1,21 @@
+# Dependencies & build
+node_modules/
+dist/
+*.tsbuildinfo
+.turbo/
+coverage/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Scratch / temp
+_tmp_*
+*.log

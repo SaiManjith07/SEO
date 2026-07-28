@@ -1,0 +1,25 @@
+{
+  "name": "@seokit/critic-mcp",
+  "version": "0.1.0",
+  "description": "MCP server that independently grades sites against published benchmarks and emits a reward signal.",
+  "type": "module",
+  "bin": { "seokit-critic": "./dist/index.js" },
+  "main": "./dist/index.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/index.js",
+    "test": "echo \"no tests\" && exit 0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@seokit/critic": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  },
+  "license": "MIT"
+}
