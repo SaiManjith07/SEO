@@ -1,5 +1,5 @@
 {
-  "id": "ev_seo.sitemap_sitemap-validator_1785403626647",
+  "id": "ev_seo.sitemap_sitemap-validator_1785403858016",
   "schemaVersion": 1,
   "taskId": "task_ver",
   "executionId": "p-ver",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "Missing sitemap.xml content",
-  "timestamp": "2026-07-30T09:27:06.647Z"
+  "timestamp": "2026-07-30T09:30:58.016Z"
 }

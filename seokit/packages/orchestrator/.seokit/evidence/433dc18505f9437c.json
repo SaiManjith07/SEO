@@ -1,5 +1,5 @@
 {
-  "id": "ev_geo.audit_geo-quotes-validator_1785403626666",
+  "id": "ev_geo.audit_geo-quotes-validator_1785403858027",
   "schemaVersion": 1,
   "taskId": "task_ver",
   "executionId": "p-ver",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "GEO check failed: Page lacks authoritative quotations or blockquote blocks.",
-  "timestamp": "2026-07-30T09:27:06.666Z",
+  "timestamp": "2026-07-30T09:30:58.027Z",
   "fixPlan": {
     "ruleId": "geo.quotes.authority",
     "description": "Missing direct citations or quotes from credible named sources.",

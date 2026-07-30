@@ -1,5 +1,5 @@
 {
-  "id": "ev_aeo.audit_aeo-headings-validator_1785403626659",
+  "id": "ev_aeo.audit_aeo-headings-validator_1785403858021",
   "schemaVersion": 1,
   "taskId": "task_ver",
   "executionId": "p-ver",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "Answer Engine target: headings should align directly with user query terms.",
-  "timestamp": "2026-07-30T09:27:06.659Z",
+  "timestamp": "2026-07-30T09:30:58.021Z",
   "fixPlan": {
     "ruleId": "aeo.headings.questions",
     "description": "No question-shaped headings are present.",

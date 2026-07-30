@@ -1,5 +1,5 @@
 {
-  "id": "ev_aeo.audit_aeo-extractability-validator_1785403626759",
+  "id": "ev_aeo.audit_aeo-extractability-validator_1785403858344",
   "schemaVersion": 1,
   "taskId": "task_ver_fail",
   "executionId": "p-ver-fail",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "AEO target: page word count is only 0 words (threshold: 200 words).",
-  "timestamp": "2026-07-30T09:27:06.759Z",
+  "timestamp": "2026-07-30T09:30:58.344Z",
   "fixPlan": {
     "ruleId": "aeo.extractability.wordcount",
     "description": "Insufficient content size for answer engines.",

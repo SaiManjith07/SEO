@@ -1,8 +1,8 @@
 {
-  "id": "ev_performance.audit_webvitals-validator_1785403626555",
+  "id": "ev_performance.audit_webvitals-validator_1785403857919",
   "schemaVersion": 1,
   "taskId": "task_root_verify",
-  "executionId": "project_1785403626480",
+  "executionId": "project_1785403857850",
   "capabilityId": "performance.audit",
   "ruleId": "performance.webvitals.lcp",
   "treeHash": "mock-tree-hash",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": true,
   "output": "{\"webVitals\":{\"lcp\":1.5,\"cls\":0.02,\"inp\":100}}",
-  "timestamp": "2026-07-30T09:27:06.555Z"
+  "timestamp": "2026-07-30T09:30:57.919Z"
 }

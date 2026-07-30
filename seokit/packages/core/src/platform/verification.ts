@@ -1,4 +1,5 @@
 import { ExecutableRule, RuleRegistry } from './rules.js';
+import { VERSION } from '../version.js';
 import { CapabilityRegistry } from './capabilities.js';
 import { ValidatorRegistry, ExecutionPlan, VerificationEvidence } from './validators.js';
 import * as cheerio from 'cheerio';
@@ -175,7 +176,7 @@ export class VerificationEngine {
         ev.standard = rule.standard;
       } else {
         ev.ruleId = ev.ruleId || `rule_${ev.source}`;
-        ev.ruleVersion = ev.ruleVersion || '1.0.0';
+        ev.ruleVersion = ev.ruleVersion || VERSION;
       }
     }
     return evidences;

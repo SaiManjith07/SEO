@@ -1,5 +1,5 @@
 {
-  "id": "ev_performance.audit_webvitals-validator_1785403626649",
+  "id": "ev_performance.audit_webvitals-validator_1785403858016",
   "schemaVersion": 1,
   "taskId": "task_ver",
   "executionId": "p-ver",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": true,
   "output": "{\"webVitals\":{\"lcp\":1.5,\"cls\":0.02,\"inp\":100}}",
-  "timestamp": "2026-07-30T09:27:06.649Z"
+  "timestamp": "2026-07-30T09:30:58.017Z"
 }

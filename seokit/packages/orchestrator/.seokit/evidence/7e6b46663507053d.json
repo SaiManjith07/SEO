@@ -1,5 +1,5 @@
 {
-  "id": "ev_performance.audit_font-validator_1785403626653",
+  "id": "ev_performance.audit_font-validator_1785403858018",
   "schemaVersion": 1,
   "taskId": "task_ver",
   "executionId": "p-ver",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": true,
   "output": "Web fonts optimization: Consider preloading critical web fonts to avoid layout shifts.",
-  "timestamp": "2026-07-30T09:27:06.653Z"
+  "timestamp": "2026-07-30T09:30:58.018Z"
 }

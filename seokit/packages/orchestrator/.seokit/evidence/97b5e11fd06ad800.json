@@ -1,5 +1,5 @@
 {
-  "id": "ev_geo.audit_geo-citation-validator_1785403626664",
+  "id": "ev_geo.audit_geo-citation-validator_1785403858025",
   "schemaVersion": 1,
   "taskId": "task_ver",
   "executionId": "p-ver",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "GEO check failed: Missing outbound citation hyperlinks.",
-  "timestamp": "2026-07-30T09:27:06.664Z",
+  "timestamp": "2026-07-30T09:30:58.025Z",
   "fixPlan": {
     "ruleId": "geo.citation.markup",
     "description": "Missing authoritative external links or citation sources.",

@@ -1,5 +1,5 @@
 {
-  "id": "ev_seo.robots_robots-validator_1785403626749",
+  "id": "ev_seo.robots_robots-validator_1785403858331",
   "schemaVersion": 1,
   "taskId": "task_ver_fail",
   "executionId": "p-ver-fail",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "Missing robots.txt content",
-  "timestamp": "2026-07-30T09:27:06.749Z",
+  "timestamp": "2026-07-30T09:30:58.331Z",
   "fixPlan": {
     "ruleId": "seo.robots.valid",
     "description": "No robots.txt content was found to analyze.",

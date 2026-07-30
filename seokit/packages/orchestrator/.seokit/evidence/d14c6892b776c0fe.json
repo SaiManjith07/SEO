@@ -1,5 +1,5 @@
 {
-  "id": "ev_seo.canonical_canonical-validator_1785403626747",
+  "id": "ev_seo.canonical_canonical-validator_1785403858326",
   "schemaVersion": 1,
   "taskId": "task_ver_fail",
   "executionId": "p-ver-fail",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "Invalid relative canonical URL: \"/relative-path\". Absolute URL required.",
-  "timestamp": "2026-07-30T09:27:06.747Z",
+  "timestamp": "2026-07-30T09:30:58.326Z",
   "fixPlan": {
     "ruleId": "seo.canonical.exists",
     "description": "Relative rel=\"canonical\" link element found.",

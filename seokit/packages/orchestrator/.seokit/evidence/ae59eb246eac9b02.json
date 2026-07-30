@@ -1,5 +1,5 @@
 {
-  "id": "ev_geo.audit_geo-provenance-validator_1785403626762",
+  "id": "ev_geo.audit_geo-provenance-validator_1785403858348",
   "schemaVersion": 1,
   "taskId": "task_ver_fail",
   "executionId": "p-ver-fail",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "GEO check failed: Missing structured date metadata signals.",
-  "timestamp": "2026-07-30T09:27:06.762Z",
+  "timestamp": "2026-07-30T09:30:58.348Z",
   "fixPlan": {
     "ruleId": "geo.provenance.dates",
     "description": "Missing content creation or update timestamps.",

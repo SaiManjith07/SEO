@@ -87,8 +87,9 @@ export async function runCli(argv: string[], cwd: string = process.cwd()): Promi
         const configPlugins = configJson.plugins || [];
         for (const name of configPlugins) {
           try {
-            if (!/^@seokit\/plugin-[a-z0-9-]+$/.test(name)) {
-              console.warn(`[WARN] Ignored unsafe or invalid plugin name: '${name}'. Must match '@seokit/plugin-[a-z0-9-]+'.`);
+            const isStandardNpm = /^(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-._~]+$/.test(name);
+            if (!isStandardNpm || name.includes('..') || name.startsWith('.') || path.isAbsolute(name)) {
+              console.warn(`[WARN] Ignored unsafe or invalid plugin name: '${name}'. Must be a standard NPM package name without relative/absolute paths.`);
               continue;
             }
             const mod = await import(name);
@@ -150,7 +151,7 @@ export async function runCli(argv: string[], cwd: string = process.cwd()): Promi
           capabilityId: ev.capabilityId || 'seo.audit',
           ruleId: ev.ruleId || 'unknown-rule',
           treeHash: 'abc',
-          ruleVersion: ev.ruleVersion || '1.0.0',
+          ruleVersion: ev.ruleVersion || VERSION,
           validatorVersion: VERSION,
           capabilityVersion: VERSION,
           frameworkSdkVersion: VERSION,
