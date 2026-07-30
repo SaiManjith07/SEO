@@ -15,14 +15,28 @@ import {
   extract,
   fetchPage,
   fetchRobotsTxt,
+  crawlSite,
   extractabilityScore,
   parseRobots,
   RETRIEVAL_BOTS,
   TRAINING_BOTS,
   USER_AGENTS,
+  detectFramework,
+  initProject,
+  saveProject,
+  loadProject,
+  saveDecision,
+  loadDecisions,
+  saveFixOutcome,
+  loadFixOutcomes,
+  extractChunks,
+  scoreChunk,
+  calculateEntityDensity,
   type Finding,
   type PageContext,
   type SiteContext,
+  type AeoChunk,
+  type ChunkScore,
 } from '@seokit/core';
 
 const server = new McpServer({ name: 'seokit', version: '0.1.0' });
@@ -290,14 +304,39 @@ server.registerTool(
       wordCount,
     );
 
+    const pageText = extract(ctx.rawHtml).text;
+    const entityAnalysis = calculateEntityDensity(pageText);
+
+    const chunks = extractChunks(ctx.rawHtml);
+    const chunkScores = chunks.map((c: AeoChunk) => ({
+      chunk: c,
+      score: scoreChunk(c),
+    }));
+
     const lines = [
       applicable
         ? `AEO extractability: ${score}/100`
         : `AEO extractability: not scored — ${reason}`,
       '',
+      '### Guidelines Checklist',
       ...Object.entries(breakdown).map(
         ([id, ok]) => `  ${ok ? 'PASS' : 'FAIL'}  ${id}`,
       ),
+      '',
+      '### Entity Density Audit',
+      `  - Unique Noun Mentions: ${entityAnalysis.nouns.length}`,
+      `  - Pronoun Mentions:      ${entityAnalysis.pronouns.length}`,
+      `  - Noun-to-Pronoun Ratio: ${entityAnalysis.ratio} (Target: > 1.5)`,
+      `  - Entity Clarity Grade:  ${entityAnalysis.densityScore}/100`,
+      `  - Identified Entities:   ${entityAnalysis.nouns.slice(0, 15).join(', ')}${entityAnalysis.nouns.length > 15 ? '...' : ''}`,
+      '',
+      '### Chunk-Level RAG Suitability Table',
+      '| Heading | Words | Question Head | BLUFF Pass | Pronouns | Evidence | Suitability |',
+      '|---|---|---|---|---|---|---|',
+      ...chunkScores.map((cs: { chunk: AeoChunk; score: ChunkScore }) => {
+        const h = cs.chunk.heading.length > 30 ? cs.chunk.heading.substring(0, 27) + '...' : cs.chunk.heading;
+        return `| ${h} | ${cs.score.wordCount} | ${cs.score.questionHead ? 'Yes' : 'No'} | ${cs.score.bluffScore === 100 ? 'Yes' : 'No'} | ${cs.score.pronounDensity}% | ${cs.score.evidenceCount} | **${cs.score.suitabilityScore}/100** |`;
+      }),
     ];
 
     const aeoFindings = findings.filter((f) => f.ruleId.startsWith('aeo/'));
@@ -451,6 +490,358 @@ server.registerTool(
         ),
       ].join('\n'),
     );
+  },
+);
+
+// ---------------------------------------------------------------------------
+// seo_crawl_site — recursive site crawl and audit
+// ---------------------------------------------------------------------------
+
+server.registerTool(
+  'seo_crawl_site',
+  {
+    title: 'Crawl and audit a full site',
+    description:
+      'Recursively crawl a website starting at a seed URL, mapping internal links ' +
+      'and executing both page-level and site-level standards checks.',
+    inputSchema: {
+      url: z.string().url().describe('Seed URL (origin) of website to crawl'),
+      maxPages: z
+        .number()
+        .min(1)
+        .max(100)
+        .default(10)
+        .describe('Maximum number of internal pages to fetch'),
+      render: z
+        .boolean()
+        .default(false)
+        .describe('Run headless Chromium for page rendering'),
+    },
+  },
+  async ({ url, maxPages, render }) => {
+    const siteCtx = await crawlSite(url, maxPages, render);
+    const lines: string[] = [
+      `Crawl audit report — Seed: ${url}`,
+      `Crawled ${siteCtx.pages.length} pages. Found sitemaps: ${siteCtx.sitemapUrls.join(', ') || 'None'}`,
+      '',
+    ];
+
+    // Run rules on SiteContext
+    const { findings: siteFindings } = runRules(siteCtx);
+    if (siteFindings.length > 0) {
+      lines.push(formatFindings(siteFindings, '## Site-level findings'));
+      lines.push('');
+    }
+
+    // Run rules on each individual PageContext crawled
+    lines.push('## Page-level findings');
+    for (const page of siteCtx.pages) {
+      const { findings: pageFindings } = runRules(page);
+      if (pageFindings.length > 0) {
+        lines.push(formatFindings(pageFindings, `### ${page.url} (Status ${page.status})`));
+        lines.push('');
+      } else {
+        lines.push(`### ${page.url} (Status ${page.status}) — Clean`);
+        lines.push('');
+      }
+    }
+
+    return text(lines.join('\n'));
+  },
+);
+
+// ---------------------------------------------------------------------------
+// seo_find_opportunities — strike-distance analysis from GSC logs
+// ---------------------------------------------------------------------------
+
+server.registerTool(
+  'seo_find_opportunities',
+  {
+    title: 'Find striking-distance opportunities',
+    description:
+      'Analyze Google Search Console query logs to locate "sleeper" pages in positions ' +
+      '5–15 that have high impressions but low CTR. Ranks them by priority value ' +
+      '(impressions × expectedRewardGain) for content optimization roadmaps.',
+    inputSchema: {
+      gscData: z
+        .string()
+        .describe(
+          'JSON array of GSC query performance logs. Example: [{"page": "https://example.com/page", "query": "buy widgets", "impressions": 1000, "clicks": 10, "position": 8.5}]'
+        ),
+    },
+  },
+  async ({ gscData }) => {
+    let records: Array<{
+      page: string;
+      query: string;
+      impressions: number;
+      clicks: number;
+      position: number;
+    }> = [];
+
+    try {
+      records = JSON.parse(gscData);
+    } catch {
+      return text('Invalid JSON data format. Ensure payload parses as a valid GSC records array.');
+    }
+
+    if (records.length === 0) {
+      return text('No records found in GSC data array.');
+    }
+
+    // Group by page to summarize performance
+    const pageStats = new Map<string, { impressions: number; clicks: number; sumPos: number; count: number }>();
+    for (const r of records) {
+      const stats = pageStats.get(r.page) || { impressions: 0, clicks: 0, sumPos: 0, count: 0 };
+      stats.impressions += r.impressions;
+      stats.clicks += r.clicks;
+      stats.sumPos += r.position * r.impressions; // Weight position by impressions
+      stats.count += r.impressions;
+      pageStats.set(r.page, stats);
+    }
+
+    interface Opportunity {
+      page: string;
+      impressions: number;
+      clicks: number;
+      ctr: number;
+      avgPosition: number;
+      expectedRewardGain: number;
+      potentialValue: number;
+    }
+
+    const opportunities: Opportunity[] = [];
+
+    for (const [page, stats] of pageStats.entries()) {
+      const avgPos = stats.count > 0 ? stats.sumPos / stats.count : 0;
+      const ctr = stats.impressions > 0 ? stats.clicks / stats.impressions : 0;
+      
+      // Filter to striking-distance window: position 5.0 to 15.0
+      if (avgPos >= 4.0 && avgPos <= 15.0) {
+        // Approximate expectedRewardGain based on proximity to top 3 positions
+        // Closer to position 5 yields a higher multiplier
+        const expectedRewardGain = Math.max(0.05, (15.0 - avgPos) / 20.0);
+        const potentialValue = Math.round(stats.impressions * expectedRewardGain);
+
+        opportunities.push({
+          page,
+          impressions: stats.impressions,
+          clicks: stats.clicks,
+          ctr: parseFloat((ctr * 100).toFixed(2)),
+          avgPosition: parseFloat(avgPos.toFixed(1)),
+          expectedRewardGain: parseFloat(expectedRewardGain.toFixed(2)),
+          potentialValue,
+        });
+      }
+    }
+
+    // Sort opportunities by potential value descending
+    opportunities.sort((a, b) => b.potentialValue - a.potentialValue);
+
+    const lines: string[] = [
+      '# Prioritized Content Restructuring Roadmap',
+      'Ranked by potential traffic yield: `Impressions × Expected Gain`',
+      '',
+      '| Priority | Page URL | Avg Position | Current CTR | Impressions | Expected Gain | Est Value Lift |',
+      '|---|---|---|---|---|---|---|',
+    ];
+
+    opportunities.forEach((o, index) => {
+      lines.push(
+        `| #${index + 1} | [${o.page}](${o.page}) | ${o.avgPosition} | ${o.ctr}% | ${o.impressions} | +${o.expectedRewardGain} | **+${o.potentialValue}** |`
+      );
+    });
+
+    if (opportunities.length === 0) {
+      lines.push('No striking-distance pages found in positions 4–15. Check your filter logs.');
+    }
+
+    return text(lines.join('\n'));
+  },
+);
+
+// ---------------------------------------------------------------------------
+// seo_init — scaffold files and detect framework
+// ---------------------------------------------------------------------------
+
+server.registerTool(
+  'seo_init',
+  {
+    title: 'Initialize project SEO configuration',
+    description:
+      'Detect the web framework of the project, initialize the `.seokit/` config folder, ' +
+      'and scaffold necessary robots.txt, llms.txt, guidelines, and CI GitHub Action pipelines.',
+    inputSchema: {
+      root: z.string().describe('Absolute folder path of project root directory'),
+      framework: z
+        .enum(['next', 'nuxt', 'astro', 'sveltekit', 'remix', 'static', 'unknown'])
+        .optional()
+        .describe('Explicitly force web framework scaffolding conventions'),
+    },
+  },
+  async ({ root, framework }) => {
+    try {
+      const res = await initProject(root, framework);
+      return text(
+        JSON.stringify(
+          {
+            success: true,
+            detectedFramework: res.framework,
+            filesScaffolded: res.filesScaffolded,
+            message: `Successfully initialized project at ${root}. Scaffolded files: ${res.filesScaffolded.join(', ') || 'None (already initialized)'}`,
+          },
+          null,
+          2
+        )
+      );
+    } catch (err: any) {
+      return text(JSON.stringify({ success: false, error: err.message }, null, 2));
+    }
+  },
+);
+
+// ---------------------------------------------------------------------------
+// memory_load — fetch saved decisions and outcome metrics
+// ---------------------------------------------------------------------------
+
+server.registerTool(
+  'memory_load',
+  {
+    title: 'Load project conventions and decisions',
+    description:
+      'Load saved human decisions (overruled guidelines) and historic optimization ' +
+      'outcome logs for the project. Restricts agent from suggesting previously rejected options.',
+    inputSchema: {
+      projectId: z.string().describe('The absolute path/identifier of the project root directory'),
+      key: z.enum(['decisions', 'outcomes']).optional().describe('Filter by specific memory key'),
+    },
+  },
+  async ({ projectId, key }) => {
+    try {
+      let project = loadProject(projectId);
+      if (!project) {
+        const id = saveProject(projectId);
+        project = { id, root: projectId, updatedAt: new Date().toISOString() };
+      }
+
+      const response: Record<string, any> = {
+        projectId: project.id,
+        root: project.root,
+      };
+
+      if (!key || key === 'decisions') {
+        response.decisions = loadDecisions(project.root, project.id);
+      }
+      if (!key || key === 'outcomes') {
+        response.outcomes = loadFixOutcomes(project.root, project.id);
+      }
+
+      return text(JSON.stringify(response, null, 2));
+    } catch (err: any) {
+      return text(JSON.stringify({ success: false, error: err.message }, null, 2));
+    }
+  },
+);
+
+// ---------------------------------------------------------------------------
+// memory_save_decision — record override decisions
+// ---------------------------------------------------------------------------
+
+server.registerTool(
+  'memory_save_decision',
+  {
+    title: 'Record a human override decision',
+    description:
+      'Save when a human reviewer ignores or overrules a rule warning with a specific ' +
+      'rationale, preventing future sessions from attempting the same check.',
+    inputSchema: {
+      projectId: z.string().describe('The absolute path/identifier of the project root directory'),
+      ruleId: z.string().describe('The specific Standard ID or rule name being overruled (e.g. STD-09)'),
+      decision: z.string().describe('The override actions decided (e.g. ignore standard check)'),
+      rationale: z.string().describe('User explained justification rationale for override'),
+    },
+  },
+  async ({ projectId, ruleId, decision, rationale }) => {
+    try {
+      let project = loadProject(projectId);
+      if (!project) {
+        const id = saveProject(projectId);
+        project = { id, root: projectId, updatedAt: new Date().toISOString() };
+      }
+
+      const decisionId = saveDecision(project.root, project.id, ruleId, decision, rationale);
+      return text(
+        JSON.stringify(
+          {
+            success: true,
+            decisionId,
+            message: `Override decision for rule ${ruleId} recorded successfully.`,
+          },
+          null,
+          2
+        )
+      );
+    } catch (err: any) {
+      return text(JSON.stringify({ success: false, error: err.message }, null, 2));
+    }
+  },
+);
+
+// ---------------------------------------------------------------------------
+// memory_save_outcome — record fix metrics
+// ---------------------------------------------------------------------------
+
+server.registerTool(
+  'memory_save_outcome',
+  {
+    title: 'Record an optimization fix outcome',
+    description:
+      'Log when a fix is applied to record the before/after rewards and predicted gains. ' +
+      'Enables calibration accuracy calculations.',
+    inputSchema: {
+      projectId: z.string().describe('The absolute path/identifier of the project root directory'),
+      url: z.string().url().describe('The URL of the optimized page'),
+      ruleId: z.string().describe('The specific standard ID resolved (e.g. STD-06)'),
+      fixSummary: z.string().describe('Brief description of changes made'),
+      rewardBefore: z.number().describe('Evaluator score before optimizations'),
+      rewardAfter: z.number().describe('Evaluator score after optimizations'),
+      predictedGain: z.number().describe('The expected rating delta predicted by critic'),
+      worked: z.boolean().describe('Did this fix improve actual traffic/ranking signals'),
+    },
+  },
+  async ({ projectId, url, ruleId, fixSummary, rewardBefore, rewardAfter, predictedGain, worked }) => {
+    try {
+      let project = loadProject(projectId);
+      if (!project) {
+        const id = saveProject(projectId);
+        project = { id, root: projectId, updatedAt: new Date().toISOString() };
+      }
+
+      const outcomeId = saveFixOutcome(
+        project.root,
+        project.id,
+        url,
+        ruleId,
+        fixSummary,
+        rewardBefore,
+        rewardAfter,
+        predictedGain,
+        worked ? 1 : 0
+      );
+      return text(
+        JSON.stringify(
+          {
+            success: true,
+            outcomeId,
+            message: `Fix outcome for standard ${ruleId} logged successfully.`,
+          },
+          null,
+          2
+        )
+      );
+    } catch (err: any) {
+      return text(JSON.stringify({ success: false, error: err.message }, null, 2));
+    }
   },
 );
 

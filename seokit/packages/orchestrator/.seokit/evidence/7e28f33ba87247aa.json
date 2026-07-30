@@ -1,0 +1,16 @@
+{
+  "id": "ev_accessibility.audit_aria-validator_1785398513448",
+  "schemaVersion": 1,
+  "taskId": "task_ver",
+  "executionId": "p-ver",
+  "capabilityId": "accessibility.audit",
+  "ruleId": "accessibility.aria.roles",
+  "treeHash": "mock-tree-hash",
+  "ruleVersion": "1.0.0",
+  "validatorVersion": "1.0.0",
+  "capabilityVersion": "1.0.0",
+  "frameworkSdkVersion": "1.0.0",
+  "passed": true,
+  "output": "ARIA role configurations verified successfully.",
+  "timestamp": "2026-07-30T08:01:53.448Z"
+}

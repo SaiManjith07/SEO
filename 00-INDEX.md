@@ -20,41 +20,88 @@
 
 ---
 
-## Read in this order
+## Folder structure
+
+```
+SEO/
+├── 00-INDEX.md              you are here
+├── research/                 narrative research pack — the "why", read once
+│   ├── 01-SEO-fundamentals-2026.md
+│   ├── 02-AEO-answer-engine-optimization.md
+│   ├── 03-GEO-generative-engine-optimization.md
+│   ├── 04-technical-requirements.md
+│   ├── 05-implementation-playbook.md
+│   ├── 06-tools-and-platforms.md
+│   └── 07-algorithms-and-how-ranking-works.md
+├── knowledge-base/           CANONICAL — the checklist / data form, read repeatedly
+│   ├── README.md              pipeline model, prerequisite ladder, limitations, dimension weights
+│   ├── manifest.json           machine-readable index of every STD-##/TOOL-## — the MCP resource source
+│   ├── diagnostics.md          symptom → failing stage → which standards to check
+│   ├── standards/               32 standards (STD-01–32), one file per category
+│   └── tools/                    GSC/GA4/CrUX/etc. — what to check, what values mean
+├── architecture/              MCP server design — how to build the tool
+│   ├── 15-mcp-evaluator-critic-architecture.md   CANONICAL — supersedes 08, 09, 13
+│   ├── 08-13...                                    historical rationale, kept for context
+├── seokit/                    working code — two MCP servers, 31 tests passing
+└── (this file)
+```
+
+**Two different jobs, two different folders.** `research/` explains *why* each standard exists — read once, front to back. `knowledge-base/` is *what to check and what value counts as a pass* — read in fragments, re-read constantly, and eventually load programmatically via `manifest.json`. Don't confuse the two: if you're doing SEO work day-to-day, live in `knowledge-base/`; if you're building the tool or need the underlying evidence, go to `research/`.
+
+---
+
+## Read in this order — research pack
 
 | File | What it covers |
 |---|---|
-| `01-SEO-fundamentals-2026.md` | How Google ranking works today, 2026 algorithm changes, ranking factor evidence, keyword strategy |
-| `02-AEO-answer-engine-optimization.md` | Answer engines, citation mechanics, AI Overviews, conversion data, the AEO playbook |
-| `03-GEO-generative-engine-optimization.md` | Princeton study, RAG vs training data, query fan-out, platform biases, off-site authority, BLUFF |
-| `04-technical-requirements.md` | The engineering checklist — crawler access, SSR, schema, CWV, semantic HTML, 404 hallucinations, llms.txt |
-| `05-implementation-playbook.md` | Phased plan, measurement instrumentation, tooling, realistic timelines, conflicting-figures table |
-| `06-tools-and-platforms.md` | Every tool worth knowing — what it does, price, how to use it, recommended stacks by budget, where to learn |
-| `07-algorithms-and-how-ranking-works.md` | The actual IR algorithms (BM25, PageRank, embeddings, RAG), Google's update history, prerequisites, how to optimise rank, 90-day learning path |
+| `research/01-SEO-fundamentals-2026.md` | How Google ranking works today, 2026 algorithm changes, ranking factor evidence, keyword strategy |
+| `research/02-AEO-answer-engine-optimization.md` | Answer engines, citation mechanics, AI Overviews, conversion data, the AEO playbook |
+| `research/03-GEO-generative-engine-optimization.md` | Princeton study, RAG vs training data, query fan-out, platform biases, off-site authority, BLUFF |
+| `research/04-technical-requirements.md` | The engineering checklist — crawler access, SSR, schema, CWV, semantic HTML, 404 hallucinations, llms.txt |
+| `research/05-implementation-playbook.md` | Phased plan, measurement instrumentation, tooling, realistic timelines, conflicting-figures table |
+| `research/06-tools-and-platforms.md` | Every tool worth knowing — what it does, price, how to use it, recommended stacks by budget, where to learn |
+| `research/07-algorithms-and-how-ranking-works.md` | The actual IR algorithms (BM25, PageRank, embeddings, RAG), Google's update history, prerequisites, how to optimise rank, 90-day learning path |
 
-**If you read only one thing:** §7 of `05-implementation-playbook.md` — the five things that matter most.
+**If you read only one thing:** §7 of `research/05-implementation-playbook.md` — the five things that matter most.
 
-**If you're an engineer:** start with `07`. It explains the mechanics the rest of the industry papers over.
+**If you're an engineer:** start with `research/07`. It explains the mechanics the rest of the industry papers over.
+
+---
+
+## The knowledge base — canonical, operational reference
+
+**Built as `.md` files only** — no JSON. Every file carries YAML frontmatter (id, discipline, type, tags, related) so the folder is ready for the heading-based hybrid-retrieval pipeline described in `knowledge-base/architecture-notes/retrieval-architecture.md`, without requiring a database to be useful today.
+
+| Path | What it covers |
+|---|---|
+| `knowledge-base/README.md` | **Start here.** Pipeline model, prerequisite ladder (Level 0–4), honest limitations, standard→reward-dimension weight table |
+| `knowledge-base/INDEX.md` | Full markdown lookup table — every `STD-##` and `TOOL-##` in one place: category, gate, weight, file, verifying tool |
+| `knowledge-base/diagnostics.md` | Symptom-to-stage triage table — start here when something breaks |
+| `knowledge-base/SEO/`, `AEO/`, `GEO/`, `LLMO/` | **Browse by discipline.** Each `README.md` explains how that discipline works and indexes the standards that matter to it. `SEO/groups/` further splits SEO into 6 functional areas: keyword analysis, Google Search Console, traffic identification, crawling, page performance, competitive analysis |
+| `knowledge-base/standards/01-access-indexability.md` … `08-llmo.md` | **Browse by failure mode.** The 32 standards (STD-01–32), organized by what breaks, not by acronym — the content every discipline folder indexes into |
+| `knowledge-base/tools/tools-reference.md` | GSC, GA4, PageSpeed/CrUX, Rich Results Test, server logs, Ahrefs/Semrush, AI-visibility tools, Google Business Profile — exact report, exact metric, exact passing value, per standard |
 
 ---
 
 ## Build track — SEOKit
 
-Files 08–13 cover designing and building the tool, not doing SEO.
+`architecture/` covers designing and building the tool, not doing SEO.
 
 | File | What it covers |
 |---|---|
-| `08-seo-tool-architecture.md` | Why MCP is the core, rule-engine design, three modes |
-| `09-critic-architecture.md` | The second server: benchmarks, reward function, gates, reward-hacking limits |
-| `10-prior-art.md` | Who built this already — **includes two corrections to my own claims** |
-| `11-competitive-strategy.md` | Incumbent teardown, weakness→strength conversion, the zero-cost data stack |
-| `12-cursor-prompt-pack.md` | Eight copy-pasteable Cursor prompts with verification commands |
-| `13-system-architecture.md` | **The full design:** layers, knowledge base schema, agent loop protocol, skill packs |
+| `architecture/15-mcp-evaluator-critic-architecture.md` | **Canonical.** The full MCP design — evaluator + critic, knowledge base tiers, reward function, agent loop protocol. Supersedes 08, 09, and 13. |
+| `architecture/08-seo-tool-architecture.md` | Historical — why MCP is the core, rule-engine design, three modes |
+| `architecture/09-critic-architecture.md` | Historical — benchmarks, reward function, gates, reward-hacking limits |
+| `architecture/10-prior-art.md` | Who built this already — **includes two corrections to my own claims** |
+| `architecture/11-competitive-strategy.md` | Incumbent teardown, weakness→strength conversion, the zero-cost data stack |
+| `architecture/12-cursor-prompt-pack.md` | Eight copy-pasteable Cursor prompts with verification commands |
+| `architecture/13-system-architecture.md` | Historical — layers, knowledge base schema, agent loop protocol, skill packs |
+| `architecture/16-antigravity-research-task-prompt.md` | Ready-to-paste prompt for Antigravity (or any agentic IDE) to verify claims, run a worked example against a real URL, and report back |
 
-**Working code:** `seokit/` — two MCP servers, 31 tests passing.
+**Working code:** `seokit/` — two MCP servers, 31 tests passing, already implements most of `architecture/15`.
 `seokit/AGENTS.md` is the project constitution; Cursor reads it automatically.
 
-**Start here to build:** `13-system-architecture.md`, then prompt 1 in `12`.
+**Start here to build:** `knowledge-base/README.md`, then `architecture/15`, then prompt 1 in `architecture/12`.
 
 ---
 
@@ -99,6 +146,6 @@ Only the Princeton GEO paper is peer-reviewed. Everything else is vendor or agen
 
 Statistics in these files are labelled with their source. Treat the direction of travel as reliable; treat any single decimal point as approximate.
 
-A table of **directly conflicting figures** — where two credible sources report different values for the same thing — is in §8 of `05-implementation-playbook.md`. Check it before quoting any statistic externally.
+A table of **directly conflicting figures** — where two credible sources report different values for the same thing — is in §8 of `research/05-implementation-playbook.md`. Check it before quoting any statistic externally.
 
 **The one number that should anchor your priorities:** across Cloudflare Radar's May 2026 data, Google sent **87.63%** of all search referral traffic, while every AI chatbot combined sent **0.29%**. AI search is growing fast and matters strategically — but classic SEO is still where essentially all the traffic is. Budget accordingly.

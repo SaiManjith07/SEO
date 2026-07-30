@@ -1,0 +1,36 @@
+{
+  "name": "@seokit/orchestrator",
+  "version": "0.1.0",
+  "description": "Multi-agent coordination orchestrator for SEO/AEO/GEO/LLMO automation.",
+  "type": "module",
+  "bin": {
+    "seokit-orchestrate": "./dist/cli.js"
+  },
+  "main": "./dist/loop.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/cli.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@seokit/core": "workspace:*",
+    "@seokit/coder-mcp": "workspace:*",
+    "@seokit/plugin-seo": "workspace:*",
+    "@seokit/plugin-performance": "workspace:*",
+    "@seokit/plugin-accessibility": "workspace:*",
+    "@seokit/plugin-aeo": "workspace:*",
+    "@seokit/plugin-geo": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "ev_aeo.audit_aeo-extractability-validator_1785398513362",
+  "schemaVersion": 1,
+  "taskId": "task_root_verify",
+  "executionId": "project_1785398513291",
+  "capabilityId": "aeo.audit",
+  "ruleId": "aeo.extractability.wordcount",
+  "treeHash": "mock-tree-hash",
+  "ruleVersion": "1.0.0",
+  "validatorVersion": "1.0.0",
+  "capabilityVersion": "1.0.0",
+  "frameworkSdkVersion": "1.0.0",
+  "passed": false,
+  "output": "AEO target: page word count is only 3 words (threshold: 200 words).",
+  "timestamp": "2026-07-30T08:01:53.362Z",
+  "fixPlan": {
+    "ruleId": "aeo.extractability.wordcount",
+    "description": "Insufficient content size for answer engines.",
+    "suggestedFix": "Expand content to at least 200 words under key topic headers."
+  }
+}

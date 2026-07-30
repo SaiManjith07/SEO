@@ -177,3 +177,152 @@ describe('config overrides', () => {
     expect(f?.severity).toBe('warning');
   });
 });
+
+describe('Platform Hardening - Lifecycles, Compatibility, & Reports', () => {
+  it('should enforce plugin lifecycle initialization, unloads, and version matches', async () => {
+    const initialized: string[] = [];
+    const unloaded: string[] = [];
+
+    const mockPlugin: any = {
+      id: 'mock-plugin',
+      version: '1.0.0',
+      engines: {
+        seokit: '^0.1.0'
+      },
+      capabilities: [
+        {
+          id: 'mock.cap',
+          version: '1.0.0',
+          rules: ['mock.rule'],
+          validators: ['mock-validator'],
+          frameworkCapabilities: [],
+          dependencies: [],
+          events: []
+        }
+      ],
+      validators: [
+        {
+          id: 'mock-validator',
+          version: '1.0.0',
+          async execute() {
+            return { passed: true, confidence: 1.0, output: 'Passes', source: 'mock-validator' };
+          }
+        }
+      ],
+      rules: [
+        {
+          id: 'mock.rule',
+          name: 'Mock Rule Name',
+          capabilityId: 'mock.cap',
+          severity: 'error',
+          description: 'A mock rule',
+          validatorName: 'mock-validator',
+          autoFix: false,
+          version: '1.0.0'
+        }
+      ],
+      async initialize() {
+        initialized.push('mock-plugin');
+      },
+      async unload() {
+        unloaded.push('mock-plugin');
+      }
+    };
+
+    // 1. Certify Plugin
+    const { CertificationSuite } = await import('./platform/certification.js');
+    const certSuite = new CertificationSuite();
+    const certResult = certSuite.certifyPlugin(mockPlugin);
+    expect(certResult.passed).toBe(true);
+    expect(certResult.errors).toEqual([]);
+
+    // 2. Dynamic loader lifecycle execution
+    const { CapabilityRegistry } = await import('./platform/capabilities.js');
+    const { ValidatorRegistry } = await import('./platform/validators.js');
+    const { RuleRegistry } = await import('./platform/rules.js');
+    const { FrameworkRegistry } = await import('./platform/frameworks.js');
+    const { PluginLoader } = await import('./platform/plugins.js');
+
+    const capReg = new CapabilityRegistry();
+    const valReg = new ValidatorRegistry();
+    const frmReg = new FrameworkRegistry();
+    const ruleReg = new RuleRegistry();
+    const pluginLoader = new PluginLoader(capReg, valReg, frmReg, ruleReg);
+
+    await pluginLoader.loadPlugin(mockPlugin);
+    expect(initialized).toContain('mock-plugin');
+    expect(pluginLoader.getLoadedPlugins()).toContain(mockPlugin);
+
+    // 3. Semver mismatch throws
+    const incompatiblePlugin: any = {
+      id: 'bad-plugin',
+      version: '1.0.0',
+      engines: {
+        seokit: '^2.0.0'
+      }
+    };
+    await expect(pluginLoader.loadPlugin(incompatiblePlugin)).rejects.toThrow();
+
+    // 4. Unload Plugin
+    await pluginLoader.unloadPlugin('mock-plugin');
+    expect(unloaded).toContain('mock-plugin');
+    expect(pluginLoader.getLoadedPlugins()).not.toContain(mockPlugin);
+  });
+
+  it('should generate all report formats successfully', async () => {
+    const { ReportEngine } = await import('./platform/reports.js');
+    const mockEvidenceList: any[] = [];
+    const mockEvidenceStore: any = {
+      saveEvidence(ev: any) {
+        mockEvidenceList.push(ev);
+      },
+      getEvidence(id: string) {
+        return mockEvidenceList.find(e => e.id === id) || null;
+      },
+      listEvidenceForTask(taskId: string) {
+        return mockEvidenceList.filter(e => e.taskId === taskId);
+      }
+    };
+
+    const reportEngine = new ReportEngine(mockEvidenceStore);
+    const taskId = 'task-report-test';
+    mockEvidenceStore.saveEvidence({
+      id: 'ev-1',
+      schemaVersion: 1,
+      taskId,
+      executionId: 'exec-1',
+      capabilityId: 'seo.audit',
+      ruleId: 'seo.title',
+      treeHash: 'abc',
+      ruleVersion: '1.0.0',
+      validatorVersion: '1.0.0',
+      capabilityVersion: '1.0.0',
+      frameworkSdkVersion: '1.0.0',
+      passed: false,
+      output: 'Missing title tag',
+      timestamp: new Date().toISOString(),
+      fixPlan: {
+        ruleId: 'seo.title',
+        description: 'No title tag found',
+        suggestedFix: 'Add a <title> tag to the head element',
+        targetFile: 'index.html'
+      }
+    });
+
+    const jsonReport = await reportEngine.generateReport(taskId, 'json');
+    expect(jsonReport).toContain('Missing title tag');
+    expect(JSON.parse(jsonReport).evidence.length).toBe(1);
+
+    const mdReport = await reportEngine.generateReport(taskId, 'md');
+    expect(mdReport).toContain('# SEOKit Verification Report');
+    expect(mdReport).toContain('Add a <title> tag to the head element');
+
+    const htmlReport = await reportEngine.generateReport(taskId, 'html');
+    expect(htmlReport).toContain('<h1>SEOKit Verification Report</h1>');
+    expect(htmlReport).toContain('Missing title tag');
+
+    const sarifReport = await reportEngine.generateReport(taskId, 'sarif');
+    expect(JSON.parse(sarifReport).runs[0].tool.driver.name).toBe('SEOKit Platform');
+    expect(JSON.parse(sarifReport).runs[0].results.length).toBe(1);
+  });
+});

@@ -1,0 +1,21 @@
+{
+  "id": "ev_seo.canonical_canonical-validator_1785398513535",
+  "schemaVersion": 1,
+  "taskId": "task_ver_fail",
+  "executionId": "p-ver-fail",
+  "capabilityId": "seo.canonical",
+  "ruleId": "seo.canonical.exists",
+  "treeHash": "mock-tree-hash",
+  "ruleVersion": "1.0.0",
+  "validatorVersion": "1.0.0",
+  "capabilityVersion": "1.0.0",
+  "frameworkSdkVersion": "1.0.0",
+  "passed": false,
+  "output": "Invalid relative canonical URL: \"/relative-path\". Absolute URL required.",
+  "timestamp": "2026-07-30T08:01:53.535Z",
+  "fixPlan": {
+    "ruleId": "seo.canonical.exists",
+    "description": "Relative rel=\"canonical\" link element found.",
+    "suggestedFix": "Update rel=\"canonical\" link tag to use absolute URL instead of \"/relative-path\"."
+  }
+}

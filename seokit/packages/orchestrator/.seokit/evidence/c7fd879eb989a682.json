@@ -1,0 +1,21 @@
+{
+  "id": "ev_geo.audit_geo-statistics-validator_1785398513455",
+  "schemaVersion": 1,
+  "taskId": "task_ver",
+  "executionId": "p-ver",
+  "capabilityId": "geo.audit",
+  "ruleId": "geo.statistics.density",
+  "treeHash": "mock-tree-hash",
+  "ruleVersion": "1.0.0",
+  "validatorVersion": "1.0.0",
+  "capabilityVersion": "1.0.0",
+  "frameworkSdkVersion": "1.0.0",
+  "passed": false,
+  "output": "GEO check failed: Low statistics density (found 0 numeric claims; minimum 3 required).",
+  "timestamp": "2026-07-30T08:01:53.455Z",
+  "fixPlan": {
+    "ruleId": "geo.statistics.density",
+    "description": "Vague qualitative claims lack numeric data, resulting in lower retrieval confidence.",
+    "suggestedFix": "Incorporate at least 3 distinct numerical statistics or data percentages (e.g., \"+25.9% lift\") into the body content."
+  }
+}

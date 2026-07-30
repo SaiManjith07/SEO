@@ -7,7 +7,10 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "mcp": "pnpm --filter @seokit/mcp start"
+    "lint": "pnpm -r typecheck",
+    "mcp": "pnpm --filter @seokit/mcp start",
+    "coder-mcp": "pnpm --filter @seokit/coder-mcp start",
+    "orchestrate": "pnpm --filter @seokit/orchestrator start"
   },
   "devDependencies": {
     "typescript": "^5.6.0",
