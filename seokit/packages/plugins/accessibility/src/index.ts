@@ -1,4 +1,4 @@
-import { PlatformPlugin } from '@seokit/core';
+import { PlatformPlugin, PluginRegistry } from '@seokit/core';
 import { wcagValidator } from './validators/wcag.js';
 import { ariaValidator } from './validators/aria.js';
 import { semanticValidator } from './validators/semantic.js';
@@ -126,3 +126,5 @@ export const accessibilityPlugin: PlatformPlugin = {
     }
   ]
 };
+
+PluginRegistry.register(accessibilityPlugin);

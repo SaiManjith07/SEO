@@ -187,7 +187,7 @@ describe('Platform Hardening - Lifecycles, Compatibility, & Reports', () => {
       id: 'mock-plugin',
       version: '1.0.0',
       engines: {
-        seokit: '^1.0.0'
+        seokit: '^2.0.0-rc1'
       },
       capabilities: [
         {
@@ -258,7 +258,7 @@ describe('Platform Hardening - Lifecycles, Compatibility, & Reports', () => {
       id: 'bad-plugin',
       version: '1.0.0',
       engines: {
-        seokit: '^2.0.0'
+        seokit: '^3.0.0'
       }
     };
     await expect(pluginLoader.loadPlugin(incompatiblePlugin)).rejects.toThrow();

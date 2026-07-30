@@ -1,4 +1,4 @@
-import { PlatformPlugin } from '@seokit/core';
+import { PlatformPlugin, PluginRegistry } from '@seokit/core';
 import { geoOrgValidator } from './validators/org.js';
 import { geoAuthorValidator } from './validators/author.js';
 import { geoCitationValidator } from './validators/citation.js';
@@ -141,3 +141,5 @@ export const geoPlugin: PlatformPlugin = {
     }
   ]
 };
+
+PluginRegistry.register(geoPlugin);

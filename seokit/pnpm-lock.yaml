@@ -18,6 +18,36 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.20.1)
 
+  packages/cli:
+    dependencies:
+      '@seokit/diagnostics':
+        specifier: workspace:*
+        version: link:../diagnostics
+      '@seokit/events':
+        specifier: workspace:^1.0.0
+        version: link:../events
+      '@seokit/orchestrator':
+        specifier: workspace:^1.0.0
+        version: link:../orchestrator
+      '@seokit/plugin-accessibility':
+        specifier: workspace:*
+        version: link:../plugins/accessibility
+      '@seokit/plugin-aeo':
+        specifier: workspace:*
+        version: link:../plugins/aeo
+      '@seokit/plugin-geo':
+        specifier: workspace:*
+        version: link:../plugins/geo
+      '@seokit/plugin-performance':
+        specifier: workspace:*
+        version: link:../plugins/performance
+      '@seokit/plugin-seo':
+        specifier: workspace:*
+        version: link:../plugins/seo
+      '@seokit/workspace':
+        specifier: workspace:^1.0.0
+        version: link:../workspace
+
   packages/coder-mcp:
     dependencies:
       '@modelcontextprotocol/sdk':
@@ -112,6 +142,29 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
+  packages/diagnostics:
+    dependencies:
+      '@seokit/core':
+        specifier: workspace:^1.0.0
+        version: link:../core
+      '@seokit/website':
+        specifier: workspace:^1.0.0
+        version: link:../website
+
+  packages/events: {}
+
+  packages/framework-detector:
+    dependencies:
+      '@seokit/parser':
+        specifier: workspace:^1.0.0
+        version: link:../parser
+      '@seokit/website':
+        specifier: workspace:^1.0.0
+        version: link:../website
+      cheerio:
+        specifier: ^1.0.0-rc.12
+        version: 1.2.0
+
   packages/mcp:
     dependencies:
       '@modelcontextprotocol/sdk':
@@ -120,6 +173,33 @@ importers:
       '@seokit/core':
         specifier: workspace:*
         version: link:../core
+      '@seokit/diagnostics':
+        specifier: workspace:*
+        version: link:../diagnostics
+      '@seokit/events':
+        specifier: workspace:*
+        version: link:../events
+      '@seokit/orchestrator':
+        specifier: workspace:*
+        version: link:../orchestrator
+      '@seokit/plugin-accessibility':
+        specifier: workspace:*
+        version: link:../plugins/accessibility
+      '@seokit/plugin-aeo':
+        specifier: workspace:*
+        version: link:../plugins/aeo
+      '@seokit/plugin-geo':
+        specifier: workspace:*
+        version: link:../plugins/geo
+      '@seokit/plugin-performance':
+        specifier: workspace:*
+        version: link:../plugins/performance
+      '@seokit/plugin-seo':
+        specifier: workspace:*
+        version: link:../plugins/seo
+      '@seokit/workspace':
+        specifier: workspace:*
+        version: link:../workspace
       zod:
         specifier: ^3.23.0
         version: 3.25.76
@@ -139,12 +219,24 @@ importers:
       '@seokit/core':
         specifier: workspace:*
         version: link:../core
+      '@seokit/events':
+        specifier: workspace:*
+        version: link:../events
+      '@seokit/framework-detector':
+        specifier: workspace:*
+        version: link:../framework-detector
+      '@seokit/parser':
+        specifier: workspace:*
+        version: link:../parser
       '@seokit/plugin-accessibility':
         specifier: workspace:*
         version: link:../plugins/accessibility
       '@seokit/plugin-aeo':
         specifier: workspace:*
         version: link:../plugins/aeo
+      '@seokit/plugin-framework':
+        specifier: workspace:*
+        version: link:../plugins/framework
       '@seokit/plugin-geo':
         specifier: workspace:*
         version: link:../plugins/geo
@@ -154,6 +246,15 @@ importers:
       '@seokit/plugin-seo':
         specifier: workspace:*
         version: link:../plugins/seo
+      '@seokit/providers':
+        specifier: workspace:*
+        version: link:../providers
+      '@seokit/website':
+        specifier: workspace:*
+        version: link:../website
+      '@seokit/workspace':
+        specifier: workspace:*
+        version: link:../workspace
       zod:
         specifier: ^3.23.0
         version: 3.25.76
@@ -167,6 +268,15 @@ importers:
       vitest:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.20.1)
+
+  packages/parser:
+    dependencies:
+      '@seokit/website':
+        specifier: workspace:^1.0.0
+        version: link:../website
+      cheerio:
+        specifier: ^1.0.0
+        version: 1.2.0
 
   packages/plugins/accessibility:
     dependencies:
@@ -199,6 +309,15 @@ importers:
       vitest:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@22.20.1)
+
+  packages/plugins/framework:
+    dependencies:
+      '@seokit/core':
+        specifier: workspace:*
+        version: link:../../core
+      cheerio:
+        specifier: ^1.0.0-rc.12
+        version: 1.2.0
 
   packages/plugins/geo:
     dependencies:
@@ -247,6 +366,35 @@ importers:
       vitest:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@22.20.1)
+
+  packages/providers:
+    dependencies:
+      '@seokit/core':
+        specifier: workspace:*
+        version: link:../core
+      '@seokit/parser':
+        specifier: workspace:^1.0.0
+        version: link:../parser
+      '@seokit/website':
+        specifier: workspace:^1.0.0
+        version: link:../website
+
+  packages/sdk:
+    dependencies:
+      '@seokit/core':
+        specifier: workspace:^1.0.0
+        version: link:../core
+
+  packages/website: {}
+
+  packages/workspace:
+    dependencies:
+      '@seokit/providers':
+        specifier: workspace:^1.0.0
+        version: link:../providers
+      '@seokit/website':
+        specifier: workspace:^1.0.0
+        version: link:../website
 
 packages:
 

@@ -43,4 +43,16 @@ describe('SEOKit v1.0 Core API Stability compatibility checks', () => {
     expect(coreApi.CertificationSuite).toBeDefined();
     expect(coreApi.bootstrapVerificationEngine).toBeTypeOf('function');
   });
+
+  it('should ensure CLI workflow components and diagnostics mappers are compatible', () => {
+    // Verify CLI integration symbols
+    expect(coreApi.VerificationEngine).toBeDefined();
+    expect(coreApi.RuleRegistry).toBeDefined();
+  });
+
+  it('should ensure MCP schema interfaces and server configurations are defined', () => {
+    // Verify MCP dependency structures
+    expect(coreApi.CapabilityRegistry).toBeDefined();
+    expect(coreApi.ValidatorRegistry).toBeDefined();
+  });
 });

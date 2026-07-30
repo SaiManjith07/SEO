@@ -1,0 +1,27 @@
+{
+  "name": "@seokit/cli",
+  "version": "2.0.0",
+  "description": "SEOKit v2 Platform CLI Client.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "seokit-v2": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@seokit/orchestrator": "workspace:^1.0.0",
+    "@seokit/workspace": "workspace:^1.0.0",
+    "@seokit/events": "workspace:^1.0.0",
+    "@seokit/diagnostics": "workspace:*",
+    "@seokit/plugin-seo": "workspace:*",
+    "@seokit/plugin-performance": "workspace:*",
+    "@seokit/plugin-accessibility": "workspace:*",
+    "@seokit/plugin-aeo": "workspace:*",
+    "@seokit/plugin-geo": "workspace:*"
+  }
+}

@@ -1,4 +1,4 @@
-import { PlatformPlugin } from '@seokit/core';
+import { PlatformPlugin, PluginRegistry } from '@seokit/core';
 import { metadataValidator } from './validators/metadata.js';
 import { canonicalValidator } from './validators/canonical.js';
 import { sitemapValidator } from './validators/sitemap.js';
@@ -164,3 +164,5 @@ export const seoPlugin: PlatformPlugin = {
     }
   ]
 };
+
+PluginRegistry.register(seoPlugin);

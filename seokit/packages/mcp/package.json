@@ -15,6 +15,15 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
     "@seokit/core": "workspace:*",
+    "@seokit/orchestrator": "workspace:*",
+    "@seokit/workspace": "workspace:*",
+    "@seokit/events": "workspace:*",
+    "@seokit/diagnostics": "workspace:*",
+    "@seokit/plugin-seo": "workspace:*",
+    "@seokit/plugin-performance": "workspace:*",
+    "@seokit/plugin-accessibility": "workspace:*",
+    "@seokit/plugin-aeo": "workspace:*",
+    "@seokit/plugin-geo": "workspace:*",
     "zod": "^3.23.0"
   },
   "devDependencies": {

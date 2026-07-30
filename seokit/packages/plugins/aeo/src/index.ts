@@ -1,4 +1,4 @@
-import { PlatformPlugin } from '@seokit/core';
+import { PlatformPlugin, PluginRegistry } from '@seokit/core';
 import { aeoStructureValidator } from './validators/structure.js';
 import { aeoHeadingsValidator } from './validators/headings.js';
 import { aeoFaqValidator } from './validators/faq.js';
@@ -111,3 +111,5 @@ export const aeoPlugin: PlatformPlugin = {
     }
   ]
 };
+
+PluginRegistry.register(aeoPlugin);

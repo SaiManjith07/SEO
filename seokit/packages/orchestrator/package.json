@@ -20,11 +20,18 @@
   "dependencies": {
     "@seokit/core": "workspace:*",
     "@seokit/coder-mcp": "workspace:*",
+    "@seokit/website": "workspace:*",
+    "@seokit/parser": "workspace:*",
+    "@seokit/providers": "workspace:*",
+    "@seokit/workspace": "workspace:*",
+    "@seokit/events": "workspace:*",
     "@seokit/plugin-seo": "workspace:*",
     "@seokit/plugin-performance": "workspace:*",
     "@seokit/plugin-accessibility": "workspace:*",
     "@seokit/plugin-aeo": "workspace:*",
     "@seokit/plugin-geo": "workspace:*",
+    "@seokit/plugin-framework": "workspace:*",
+    "@seokit/framework-detector": "workspace:*",
     "zod": "^3.23.0"
   },
   "devDependencies": {

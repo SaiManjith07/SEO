@@ -161,3 +161,46 @@ export class PluginLoader {
     this.loadedPlugins.delete(pluginId);
   }
 }
+
+export class PluginRegistry {
+  private static plugins: PlatformPlugin[] = [];
+
+  public static register(plugin: PlatformPlugin): void {
+    // 1. Strict Manifest Validation
+    if (!plugin.id || typeof plugin.id !== 'string') {
+      throw new Error('Invalid plugin manifest: "id" must be a non-empty string.');
+    }
+    if (!plugin.version || typeof plugin.version !== 'string') {
+      throw new Error(`Invalid plugin manifest for "${plugin.id}": "version" must be a non-empty string.`);
+    }
+
+    // 2. Version Compatibility Checks
+    const coreVersion = VERSION;
+    if (plugin.engines?.seokit) {
+      if (!satisfiesSemver(coreVersion, plugin.engines.seokit)) {
+        throw new Error(`Incompatible plugin "${plugin.id}": requires SEOKit version range "${plugin.engines.seokit}" but running core version "${coreVersion}".`);
+      }
+    }
+
+    // 3. Lifecycle triggers
+    if (plugin.initialize) {
+      try {
+        plugin.initialize({});
+      } catch (err: any) {
+        console.error(`[PluginRegistry] initialize callback failed for plugin "${plugin.id}":`, err.message);
+      }
+    }
+
+    if (!this.plugins.some(p => p.id === plugin.id)) {
+      this.plugins.push(plugin);
+    }
+  }
+
+  public static getAll(): PlatformPlugin[] {
+    return this.plugins;
+  }
+
+  public static clear(): void {
+    this.plugins = [];
+  }
+}

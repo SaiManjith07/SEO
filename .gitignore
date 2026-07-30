@@ -19,3 +19,4 @@ Thumbs.db
 # Scratch / temp
 _tmp_*
 *.log
+.seokit/

@@ -1,4 +1,4 @@
-import { PlatformPlugin } from '@seokit/core';
+import { PlatformPlugin, PluginRegistry } from '@seokit/core';
 import { lighthouseValidator } from './validators/lighthouse.js';
 import { webvitalsValidator } from './validators/webvitals.js';
 import { bundleValidator } from './validators/bundle.js';
@@ -150,3 +150,5 @@ export const performancePlugin: PlatformPlugin = {
     }
   ]
 };
+
+PluginRegistry.register(performancePlugin);

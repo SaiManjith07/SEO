@@ -187,3 +187,6 @@ export class AgentOrchestrator {
     console.log(`[Summary] Execution finished. success=${success}, score=${finalScore}, errors=${errorsCount}, warnings=${warningsCount}`);
   }
 }
+
+export * from './session.js';
+export * from './orchestrator.js';
