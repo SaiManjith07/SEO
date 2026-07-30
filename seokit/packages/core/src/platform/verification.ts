@@ -183,9 +183,12 @@ export class VerificationEngine {
 
   public async verifyProject(context: any): Promise<VerificationEvidence[]> {
     const allEvidences: VerificationEvidence[] = [];
-    const caps = this.capRegistry.getAllCapabilities();
-    for (const cap of caps) {
-      const evidences = await this.executeCapability(cap.id, context);
+    const capIds = new Set([
+      ...this.capRegistry.getAllCapabilities().map(c => c.id),
+      ...this.ruleRegistry.getAllRules().map(r => r.capabilityId)
+    ]);
+    for (const capId of capIds) {
+      const evidences = await this.executeCapability(capId, context);
       allEvidences.push(...evidences);
     }
     return allEvidences;

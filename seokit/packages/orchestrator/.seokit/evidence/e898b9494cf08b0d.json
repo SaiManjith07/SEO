@@ -1,8 +1,8 @@
 {
-  "id": "ev_seo.twitter_twitter-validator_1785399180678",
+  "id": "ev_seo.twitter_twitter-validator_1785403126983",
   "schemaVersion": 1,
   "taskId": "task_root_verify",
-  "executionId": "project_1785399180593",
+  "executionId": "project_1785403126791",
   "capabilityId": "seo.twitter",
   "ruleId": "seo.twitter.valid",
   "treeHash": "mock-tree-hash",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "Missing Twitter Cards meta tags: twitter:card, twitter:title",
-  "timestamp": "2026-07-30T08:13:00.678Z"
+  "timestamp": "2026-07-30T09:18:46.983Z"
 }

@@ -1,5 +1,5 @@
 {
-  "id": "ev_seo.canonical_canonical-validator_1785399180801",
+  "id": "ev_seo.canonical_canonical-validator_1785403127170",
   "schemaVersion": 1,
   "taskId": "task_ver",
   "executionId": "p-ver",
@@ -11,6 +11,6 @@
   "capabilityVersion": "1.0.0",
   "frameworkSdkVersion": "1.0.0",
   "passed": true,
-  "output": "Canonical absolute URL verified: http://localhost:60323/",
-  "timestamp": "2026-07-30T08:13:00.801Z"
+  "output": "Canonical absolute URL verified: http://localhost:50276/",
+  "timestamp": "2026-07-30T09:18:47.171Z"
 }

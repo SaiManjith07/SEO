@@ -187,7 +187,7 @@ describe('Platform Hardening - Lifecycles, Compatibility, & Reports', () => {
       id: 'mock-plugin',
       version: '1.0.0',
       engines: {
-        seokit: '^0.1.0'
+        seokit: '^1.0.0'
       },
       capabilities: [
         {

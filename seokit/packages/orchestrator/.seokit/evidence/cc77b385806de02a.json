@@ -1,5 +1,5 @@
 {
-  "id": "ev_seo.opengraph_opengraph-validator_1785399180903",
+  "id": "ev_seo.opengraph_opengraph-validator_1785403127280",
   "schemaVersion": 1,
   "taskId": "task_ver_fail",
   "executionId": "p-ver-fail",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "Missing Open Graph meta tags: og:title, og:description, og:image",
-  "timestamp": "2026-07-30T08:13:00.903Z"
+  "timestamp": "2026-07-30T09:18:47.280Z"
 }

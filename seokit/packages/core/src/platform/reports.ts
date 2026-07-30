@@ -83,7 +83,7 @@ export class ReportEngine {
           tool: {
             driver: {
               name: 'SEOKit Platform',
-              version: '0.1.0',
+              version: '1.0.0',
               informationUri: 'https://github.com/google-deepmind/seokit',
               rules: Array.from(new Set(evidence.map(e => e.ruleId))).map(ruleId => ({
                 id: ruleId,

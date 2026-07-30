@@ -75,7 +75,7 @@ export class PluginLoader {
     }
 
     // Version Compatibility check
-    const coreVersion = '0.1.0';
+    const coreVersion = '1.0.0';
     if (plugin.engines?.seokit) {
       if (!satisfiesSemver(coreVersion, plugin.engines.seokit)) {
         throw new Error(`Plugin '${plugin.id}' requires SEOKit version '${plugin.engines.seokit}', but core version is '${coreVersion}'.`);

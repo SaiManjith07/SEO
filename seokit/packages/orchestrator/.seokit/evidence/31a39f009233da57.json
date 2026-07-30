@@ -1,8 +1,8 @@
 {
-  "id": "ev_aeo.audit_aeo-chunking-validator_1785399180686",
+  "id": "ev_aeo.audit_aeo-chunking-validator_1785403127004",
   "schemaVersion": 1,
   "taskId": "task_root_verify",
-  "executionId": "project_1785399180593",
+  "executionId": "project_1785403126791",
   "capabilityId": "aeo.audit",
   "ruleId": "aeo.chunking.suitability",
   "treeHash": "mock-tree-hash",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "AEO chunking check: 1 of 1 chunks are not suitable as standalone answers.",
-  "timestamp": "2026-07-30T08:13:00.686Z",
+  "timestamp": "2026-07-30T09:18:47.004Z",
   "fixPlan": {
     "ruleId": "aeo.chunking.suitability",
     "description": "Text contains poor standalone answers (low BLUFF score or high pronoun density).",

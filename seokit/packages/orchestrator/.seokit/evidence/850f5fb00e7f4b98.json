@@ -1,8 +1,8 @@
 {
-  "id": "ev_accessibility.audit_semantic-validator_1785399180683",
+  "id": "ev_accessibility.audit_semantic-validator_1785403126996",
   "schemaVersion": 1,
   "taskId": "task_root_verify",
-  "executionId": "project_1785399180593",
+  "executionId": "project_1785403126791",
   "capabilityId": "accessibility.audit",
   "ruleId": "accessibility.semantic.structure",
   "treeHash": "mock-tree-hash",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "Missing semantic structural HTML elements: <header>, <main>, <footer>.",
-  "timestamp": "2026-07-30T08:13:00.683Z",
+  "timestamp": "2026-07-30T09:18:46.996Z",
   "fixPlan": {
     "ruleId": "accessibility.semantic.structure",
     "description": "Page is missing semantic block elements.",

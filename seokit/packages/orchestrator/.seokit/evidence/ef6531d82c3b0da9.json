@@ -1,8 +1,8 @@
 {
-  "id": "ev_performance.audit_image-validator_1785399180681",
+  "id": "ev_performance.audit_image-validator_1785403126993",
   "schemaVersion": 1,
   "taskId": "task_root_verify",
-  "executionId": "project_1785399180593",
+  "executionId": "project_1785403126791",
   "capabilityId": "performance.audit",
   "ruleId": "performance.images.optimized",
   "treeHash": "mock-tree-hash",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "Image optimization recommendations: Image \"/image.png\" is not in modern WebP/AVIF format.",
-  "timestamp": "2026-07-30T08:13:00.681Z"
+  "timestamp": "2026-07-30T09:18:46.993Z"
 }

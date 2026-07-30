@@ -1,8 +1,8 @@
 {
-  "id": "ev_geo.audit_geo-org-validator_1785399180687",
+  "id": "ev_geo.audit_geo-org-validator_1785403127005",
   "schemaVersion": 1,
   "taskId": "task_root_verify",
-  "executionId": "project_1785399180593",
+  "executionId": "project_1785403126791",
   "capabilityId": "geo.audit",
   "ruleId": "geo.org.schema",
   "treeHash": "mock-tree-hash",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "GEO check failed: Missing valid Organization JSON-LD block.",
-  "timestamp": "2026-07-30T08:13:00.687Z",
+  "timestamp": "2026-07-30T09:18:47.005Z",
   "fixPlan": {
     "ruleId": "geo.org.schema",
     "description": "Missing valid Organization JSON-LD schema with name and URL.",
