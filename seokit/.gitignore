@@ -2,3 +2,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 .turbo/
+.env
+.env.*
+.seokit/
+temp_cli_platform_test/
+*.tgz
+*.log

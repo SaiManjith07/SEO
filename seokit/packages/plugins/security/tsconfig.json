@@ -8,10 +8,9 @@
     "declaration": true,
     "outDir": "dist",
     "rootDir": "src",
-    "skipLibCheck": true,
     "esModuleInterop": true,
-    "types": ["node"]
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts", "dist"]
+  "include": ["src/**/*"]
 }

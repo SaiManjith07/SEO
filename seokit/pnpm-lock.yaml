@@ -26,6 +26,9 @@ importers:
       '@seokit/events':
         specifier: workspace:^1.0.0
         version: link:../events
+      '@seokit/mcp':
+        specifier: workspace:*
+        version: link:../mcp
       '@seokit/orchestrator':
         specifier: workspace:^1.0.0
         version: link:../orchestrator
@@ -41,9 +44,15 @@ importers:
       '@seokit/plugin-performance':
         specifier: workspace:*
         version: link:../plugins/performance
+      '@seokit/plugin-security':
+        specifier: workspace:*
+        version: link:../plugins/security
       '@seokit/plugin-seo':
         specifier: workspace:*
         version: link:../plugins/seo
+      '@seokit/plugin-structured-data':
+        specifier: workspace:*
+        version: link:../plugins/structured-data
       '@seokit/workspace':
         specifier: workspace:^1.0.0
         version: link:../workspace
@@ -150,6 +159,10 @@ importers:
       '@seokit/website':
         specifier: workspace:^1.0.0
         version: link:../website
+    devDependencies:
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@22.20.1)
 
   packages/events: {}
 
@@ -194,9 +207,15 @@ importers:
       '@seokit/plugin-performance':
         specifier: workspace:*
         version: link:../plugins/performance
+      '@seokit/plugin-security':
+        specifier: workspace:*
+        version: link:../plugins/security
       '@seokit/plugin-seo':
         specifier: workspace:*
         version: link:../plugins/seo
+      '@seokit/plugin-structured-data':
+        specifier: workspace:*
+        version: link:../plugins/structured-data
       '@seokit/workspace':
         specifier: workspace:*
         version: link:../workspace
@@ -246,6 +265,9 @@ importers:
       '@seokit/plugin-seo':
         specifier: workspace:*
         version: link:../plugins/seo
+      '@seokit/plugin-structured-data':
+        specifier: workspace:*
+        version: link:../plugins/structured-data
       '@seokit/providers':
         specifier: workspace:*
         version: link:../providers
@@ -351,7 +373,39 @@ importers:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@22.20.1)
 
+  packages/plugins/security:
+    dependencies:
+      '@seokit/core':
+        specifier: workspace:*
+        version: link:../../core
+      cheerio:
+        specifier: ^1.0.0
+        version: 1.2.0
+    devDependencies:
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@22.20.1)
+
   packages/plugins/seo:
+    dependencies:
+      '@seokit/core':
+        specifier: workspace:*
+        version: link:../../core
+      cheerio:
+        specifier: ^1.0.0
+        version: 1.2.0
+    devDependencies:
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@22.20.1)
+
+  packages/plugins/structured-data:
     dependencies:
       '@seokit/core':
         specifier: workspace:*

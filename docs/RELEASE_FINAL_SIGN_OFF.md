@@ -1,6 +1,6 @@
-# SEOKit v2 Final Release Sign-off
+# SEOKit v3 Final Release Sign-off
 
-This document certifies the final production checks and package validation statuses for the official **SEOKit v2.0.0** release.
+This document certifies the final production checks and package validation statuses for the official **SEOKit v3.0.0** release.
 
 ---
 
@@ -9,14 +9,14 @@ This document certifies the final production checks and package validation statu
 All monorepo packages have been validated via `npm pack`. Tarball details and file checks are summarized below:
 
 *   **`@seokit/cli`**
-    *   **Version**: `2.0.0`
-    *   **Filename**: `seokit-cli-2.0.0.tgz`
+    *   **Version**: `3.0.0`
+    *   **Filename**: `seokit-cli-3.0.0.tgz`
     *   **Status**: ✅ Passed
     *   **Files Included**: `dist/index.d.ts`, `dist/index.js`, `package.json`
 
 *   **`@seokit/mcp`**
-    *   **Version**: `1.0.0`
-    *   **Filename**: `seokit-mcp-1.0.0.tgz`
+    *   **Version**: `3.0.0`
+    *   **Filename**: `seokit-mcp-3.0.0.tgz`
     *   **Status**: ✅ Passed
     *   **Files Included**: `dist/index.d.ts`, `dist/index.js`, `package.json`
 
@@ -32,4 +32,4 @@ All monorepo packages have been validated via `npm pack`. Tarball details and fi
 
 ## 3. Final Sign-off
 
-SEOKit v2.0.0 is fully validated, verified, stable, and signed off for official production release!
+SEOKit v3.0.0 is fully validated, verified, stable, and signed off for official production release!

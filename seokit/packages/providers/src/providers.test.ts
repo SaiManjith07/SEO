@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
 import { StaticProvider } from './static.js';
 import { RemoteProvider } from './remote.js';
 import { LocalDevProvider } from './localdev.js';
@@ -53,5 +55,65 @@ describe('Website Providers Regression Checks', () => {
     expect(resolvedRemote).toBeInstanceOf(RemoteProvider);
     expect(resolvedLocal).toBeInstanceOf(LocalDevProvider);
     expect(resolvedBrowser).toBeInstanceOf(BrowserProvider);
+  });
+
+  it('should manage OAuth credential flows and refresh expired tokens', async () => {
+    const { OAuthManager } = await import('./oauth.js');
+    const tempRoot = path.resolve('tmp_oauth_test');
+    
+    if (!fs.existsSync(tempRoot)) {
+      fs.mkdirSync(tempRoot, { recursive: true });
+    }
+
+    const oauth = new OAuthManager(tempRoot);
+    const mockCreds = {
+      accessToken: 'initial_token',
+      refreshToken: 'refresh_token',
+      expiryTime: Date.now() - 1000 // expired
+    };
+
+    oauth.saveCredentials('google', mockCreds);
+
+    const creds = oauth.getCredentials('google');
+    expect(creds).toBeDefined();
+    expect(creds?.refreshToken).toBe('refresh_token');
+
+    // Token refresh flow should fire on expired tokens
+    const validToken = await oauth.getValidAccessToken('google', 'secret');
+    expect(validToken).toContain('refreshed_access_token_google');
+
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  });
+
+  it('should query live analytics performance metrics from Google and Bing connectors', async () => {
+    const { OAuthManager } = await import('./oauth.js');
+    const { GoogleIntelligenceConnector } = await import('./google.js');
+    const { BingWebmasterConnector } = await import('./bing.ts');
+    
+    const tempRoot = path.resolve('tmp_analytics_test');
+    if (!fs.existsSync(tempRoot)) {
+      fs.mkdirSync(tempRoot, { recursive: true });
+    }
+
+    const oauth = new OAuthManager(tempRoot);
+    const googleConnector = new GoogleIntelligenceConnector(oauth);
+    const bingConnector = new BingWebmasterConnector(oauth);
+
+    const googleData = await googleConnector.fetchAnalytics('https://example.com', 'google_token');
+    expect(googleData.searchPerformance.clicks).toBe(12450);
+    expect(googleData.pageSpeed.speedScore).toBe(92);
+    expect(googleData.businessProfile.reviewsAverageRating).toBe(4.8);
+    expect(googleData.businessProfile.reviewsCount).toBe(148);
+    expect(googleData.crawlStats.totalCrawlRequests).toBe(84000);
+    expect(googleData.sitemaps[0].status).toBe('Success');
+    expect(googleData.robotsTxt.status).toBe('Allowed');
+    expect(googleData.urlInspection[0].indexingState).toBe('Indexed');
+    expect(googleData.pageExperience.httpsStatus).toBe('Secure');
+
+    const bingData = await bingConnector.fetchWebmasterData('https://example.com', 'bing_token');
+    expect(bingData.clicks).toBe(3420);
+    expect(bingData.indexedPagesCount).toBe(1105);
+
+    fs.rmSync(tempRoot, { recursive: true, force: true });
   });
 });
