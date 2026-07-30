@@ -1,4 +1,5 @@
 import { EvidenceStore, EvidenceRecord } from './store.js';
+import { VERSION } from '../version.js';
 
 export type ReportFormat = 'json' | 'sarif' | 'html' | 'markdown' | 'md';
 
@@ -83,7 +84,7 @@ export class ReportEngine {
           tool: {
             driver: {
               name: 'SEOKit Platform',
-              version: '1.0.0',
+              version: VERSION,
               informationUri: 'https://github.com/google-deepmind/seokit',
               rules: Array.from(new Set(evidence.map(e => e.ruleId))).map(ruleId => ({
                 id: ruleId,

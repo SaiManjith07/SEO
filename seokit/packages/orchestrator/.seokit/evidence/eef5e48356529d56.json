@@ -1,5 +1,5 @@
 {
-  "id": "ev_aeo.audit_aeo-faq-validator_1785403127290",
+  "id": "ev_aeo.audit_aeo-faq-validator_1785403626758",
   "schemaVersion": 1,
   "taskId": "task_ver_fail",
   "executionId": "p-ver-fail",
@@ -12,7 +12,7 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "FAQ Schema check failed: No FAQPage JSON-LD schemas detected.",
-  "timestamp": "2026-07-30T09:18:47.290Z",
+  "timestamp": "2026-07-30T09:27:06.758Z",
   "fixPlan": {
     "ruleId": "aeo.faq.schema",
     "description": "Page lacks structured FAQPage JSON-LD metadata.",

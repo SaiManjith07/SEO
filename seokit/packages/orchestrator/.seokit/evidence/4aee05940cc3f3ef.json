@@ -1,5 +1,5 @@
 {
-  "id": "ev_performance.audit_compression-validator_1785403127287",
+  "id": "ev_performance.audit_compression-validator_1785403626752",
   "schemaVersion": 1,
   "taskId": "task_ver_fail",
   "executionId": "p-ver-fail",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "Caching/compression recommendations: Compression (Gzip/Brotli) not enabled; Caching (Cache-Control headers) not defined",
-  "timestamp": "2026-07-30T09:18:47.287Z"
+  "timestamp": "2026-07-30T09:27:06.752Z"
 }

@@ -51,7 +51,8 @@ export const aeoPlugin: PlatformPlugin = {
       description: 'Paragraphs must be structured cleanly for retrieval.',
       validatorName: 'aeo-structure-validator',
       autoFix: true,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-20'
     },
     {
       id: 'aeo.headings.questions',
@@ -61,7 +62,8 @@ export const aeoPlugin: PlatformPlugin = {
       description: 'Rephrase headers to match PAA structures.',
       validatorName: 'aeo-headings-validator',
       autoFix: true,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-21'
     },
     {
       id: 'aeo.faq.schema',
@@ -71,7 +73,8 @@ export const aeoPlugin: PlatformPlugin = {
       description: 'Ensure FAQPage schema is present for question-aligned content.',
       validatorName: 'aeo-faq-validator',
       autoFix: true,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-22'
     },
     {
       id: 'aeo.entity.density',
@@ -81,7 +84,8 @@ export const aeoPlugin: PlatformPlugin = {
       description: 'Nouns must outnumber vague pronouns.',
       validatorName: 'aeo-entity-validator',
       autoFix: true,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-22'
     },
     {
       id: 'aeo.chunking.suitability',
@@ -91,7 +95,8 @@ export const aeoPlugin: PlatformPlugin = {
       description: 'Ensure heading blocks are optimized for direct answers.',
       validatorName: 'aeo-chunking-validator',
       autoFix: true,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-22'
     },
     {
       id: 'aeo.extractability.wordcount',
@@ -101,7 +106,8 @@ export const aeoPlugin: PlatformPlugin = {
       description: 'Verify page has sufficient word count for answer engine extraction.',
       validatorName: 'aeo-extractability-validator',
       autoFix: false,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-22'
     }
   ]
 };

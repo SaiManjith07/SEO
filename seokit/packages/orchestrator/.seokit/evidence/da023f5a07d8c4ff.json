@@ -1,5 +1,5 @@
 {
-  "id": "ev_seo.schema_schema-validator_1785403127281",
+  "id": "ev_seo.schema_schema-validator_1785403626748",
   "schemaVersion": 1,
   "taskId": "task_ver_fail",
   "executionId": "p-ver-fail",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": false,
   "output": "No JSON-LD structured data blocks found on the page.",
-  "timestamp": "2026-07-30T09:18:47.281Z"
+  "timestamp": "2026-07-30T09:27:06.748Z"
 }

@@ -4,6 +4,7 @@ import * as path from 'path';
 import { bootstrapVerificationEngine } from './platform/bootstrap.js';
 import { FileStorageProvider } from './platform/store.js';
 import { ReportEngine } from './platform/reports.js';
+import { VERSION } from './version.js';
 
 function showHelp() {
   console.log(`
@@ -13,6 +14,7 @@ Usage:
   seokit verify [path]              Verify rules on local workspace.
   seokit report <taskId> <format>   Export report (json | html | md | sarif).
   seokit fix <taskId>               Execute fixes matching failed rule plans.
+  seokit cache clean                Clear all cached validator execution results.
   seokit help                       Show help guidelines.
 `);
 }
@@ -85,6 +87,10 @@ export async function runCli(argv: string[], cwd: string = process.cwd()): Promi
         const configPlugins = configJson.plugins || [];
         for (const name of configPlugins) {
           try {
+            if (!/^@seokit\/plugin-[a-z0-9-]+$/.test(name)) {
+              console.warn(`[WARN] Ignored unsafe or invalid plugin name: '${name}'. Must match '@seokit/plugin-[a-z0-9-]+'.`);
+              continue;
+            }
             const mod = await import(name);
             const key = Object.keys(mod).find(k => k.toLowerCase().includes('plugin'));
             if (key && mod[key]) {
@@ -103,14 +109,26 @@ export async function runCli(argv: string[], cwd: string = process.cwd()): Promi
     
     try {
       const taskId = `task_${Date.now()}`;
-      const rawHtml = fs.existsSync(path.join(targetPath, 'index.html'))
-        ? fs.readFileSync(path.join(targetPath, 'index.html'), 'utf-8')
+      const htmlPath = path.join(targetPath, 'index.html');
+      const rawHtml = fs.existsSync(htmlPath)
+        ? fs.readFileSync(htmlPath, 'utf-8')
         : '<html><head></head><body><h1>My Static Project</h1></body></html>';
+
+      const robotsPath = path.join(targetPath, 'robots.txt');
+      const robotsTxt = fs.existsSync(robotsPath)
+        ? fs.readFileSync(robotsPath, 'utf-8')
+        : 'User-agent: *\nAllow: /\nSitemap: https://example.com/sitemap.xml';
+
+      const sitemapPath = path.join(targetPath, 'sitemap.xml');
+      const sitemapXml = fs.existsSync(sitemapPath)
+        ? fs.readFileSync(sitemapPath, 'utf-8')
+        : '';
 
       const results = await engine.verifyProject({
         rawHtml,
         filePath: 'index.html',
-        robotsTxt: 'User-agent: *\nAllow: /\nSitemap: https://example.com/sitemap.xml',
+        robotsTxt,
+        sitemapXml,
         config: {
           aiCrawlers: [
             'Googlebot',
@@ -133,9 +151,9 @@ export async function runCli(argv: string[], cwd: string = process.cwd()): Promi
           ruleId: ev.ruleId || 'unknown-rule',
           treeHash: 'abc',
           ruleVersion: ev.ruleVersion || '1.0.0',
-          validatorVersion: '1.0.0',
-          capabilityVersion: '1.0.0',
-          frameworkSdkVersion: '1.0.0',
+          validatorVersion: VERSION,
+          capabilityVersion: VERSION,
+          frameworkSdkVersion: VERSION,
           passed: ev.passed,
           output: ev.output,
           timestamp: new Date().toISOString(),
@@ -216,6 +234,22 @@ export async function runCli(argv: string[], cwd: string = process.cwd()): Promi
       console.log('Fix application trace finished.');
     } catch (err: any) {
       console.error(`Fix operation failed: ${err.message}`);
+      throw err;
+    }
+  }
+  else if (command === 'cache') {
+    const action = param1;
+    if (action !== 'clean') {
+      console.error('Usage: seokit cache clean');
+      throw new Error('Invalid cache action parameter');
+    }
+
+    try {
+      const storageProvider = new FileStorageProvider(projectRoot);
+      storageProvider.cache.clear();
+      console.log('SEOKit cache cleared successfully.');
+    } catch (err: any) {
+      console.error(`Cache cleanup failed: ${err.message}`);
       throw err;
     }
   }

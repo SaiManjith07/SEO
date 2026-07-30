@@ -57,7 +57,8 @@ export const performancePlugin: PlatformPlugin = {
       description: 'Ensure Lighthouse performance metrics satisfy targets.',
       validatorName: 'lighthouse-validator',
       autoFix: false,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-13'
     },
     {
       id: 'performance.webvitals.lcp',
@@ -67,7 +68,8 @@ export const performancePlugin: PlatformPlugin = {
       description: 'Largest Contentful Paint must be under 2.5s.',
       validatorName: 'webvitals-validator',
       autoFix: false,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-13'
     },
     {
       id: 'performance.webvitals.cls',
@@ -77,7 +79,8 @@ export const performancePlugin: PlatformPlugin = {
       description: 'Cumulative Layout Shift must be under 0.1.',
       validatorName: 'webvitals-validator',
       autoFix: false,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-15'
     },
     {
       id: 'performance.webvitals.inp',
@@ -87,7 +90,8 @@ export const performancePlugin: PlatformPlugin = {
       description: 'Interaction to Next Paint must be under 200ms.',
       validatorName: 'webvitals-validator',
       autoFix: false,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-14'
     },
     {
       id: 'performance.bundle.size',
@@ -97,7 +101,8 @@ export const performancePlugin: PlatformPlugin = {
       description: 'Limit page bundle script tags counts.',
       validatorName: 'bundle-validator',
       autoFix: false,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-13'
     },
     {
       id: 'performance.images.optimized',
@@ -107,7 +112,8 @@ export const performancePlugin: PlatformPlugin = {
       description: 'Verify dimensions, lazy load status, and modern image formats.',
       validatorName: 'image-validator',
       autoFix: true,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-15'
     },
     {
       id: 'performance.fonts.optimized',
@@ -117,7 +123,8 @@ export const performancePlugin: PlatformPlugin = {
       description: 'Ensure fonts are preloaded to reduce shift.',
       validatorName: 'font-validator',
       autoFix: true,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-15'
     },
     {
       id: 'performance.resources.renderblocking',
@@ -127,7 +134,8 @@ export const performancePlugin: PlatformPlugin = {
       description: 'Eliminate render blocking scripts from head.',
       validatorName: 'renderblocking-validator',
       autoFix: true,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-13'
     },
     {
       id: 'performance.compression.caching',
@@ -137,7 +145,8 @@ export const performancePlugin: PlatformPlugin = {
       description: 'Define Cache-Control headers and payload compression features.',
       validatorName: 'compression-validator',
       autoFix: false,
-      version: '1.0.0'
+      version: '1.0.0',
+      standard: 'STD-13'
     }
   ]
 };

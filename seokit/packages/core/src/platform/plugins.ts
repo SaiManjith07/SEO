@@ -2,6 +2,7 @@ import { CapabilityRegistry, CapabilityManifest } from './capabilities.js';
 import { ValidatorRegistry, ValidatorPlugin } from './validators.js';
 import { FrameworkRegistry, FrameworkSDK } from './frameworks.js';
 import { RuleRegistry, ExecutableRule } from './rules.js';
+import { VERSION } from '../version.js';
 
 export function satisfiesSemver(version: string, range: string): boolean {
   if (!range || range === '*' || range === 'latest') return true;
@@ -75,7 +76,7 @@ export class PluginLoader {
     }
 
     // Version Compatibility check
-    const coreVersion = '1.0.0';
+    const coreVersion = VERSION;
     if (plugin.engines?.seokit) {
       if (!satisfiesSemver(coreVersion, plugin.engines.seokit)) {
         throw new Error(`Plugin '${plugin.id}' requires SEOKit version '${plugin.engines.seokit}', but core version is '${coreVersion}'.`);

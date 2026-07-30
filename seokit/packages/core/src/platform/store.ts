@@ -221,21 +221,27 @@ export class FileReportStore implements ReportStore {
   private reportsDir: string;
 
   constructor(projectRoot: string) {
-    this.reportsDir = path.join(projectRoot, '.seokit', 'reports');
+    this.reportsDir = path.resolve(projectRoot, '.seokit', 'reports');
     if (!fs.existsSync(this.reportsDir)) {
       fs.mkdirSync(this.reportsDir, { recursive: true });
     }
   }
 
   public saveReport(fileName: string, content: string): void {
-    const filePath = path.join(this.reportsDir, fileName);
-    fs.writeFileSync(filePath, content, 'utf-8');
+    const resolvedPath = path.resolve(this.reportsDir, fileName);
+    if (!resolvedPath.startsWith(this.reportsDir)) {
+      throw new Error(`Path traversal violation: "${fileName}" resolved outside reports directory.`);
+    }
+    fs.writeFileSync(resolvedPath, content, 'utf-8');
   }
 
   public getReport(fileName: string): string | null {
-    const filePath = path.join(this.reportsDir, fileName);
-    if (!fs.existsSync(filePath)) return null;
-    return fs.readFileSync(filePath, 'utf-8');
+    const resolvedPath = path.resolve(this.reportsDir, fileName);
+    if (!resolvedPath.startsWith(this.reportsDir)) {
+      throw new Error(`Path traversal violation: "${fileName}" resolved outside reports directory.`);
+    }
+    if (!fs.existsSync(resolvedPath)) return null;
+    return fs.readFileSync(resolvedPath, 'utf-8');
   }
 }
 
