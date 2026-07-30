@@ -1,8 +1,8 @@
 {
-  "id": "ev_seo.canonical_canonical-validator_1785398513351",
+  "id": "ev_seo.canonical_canonical-validator_1785399180677",
   "schemaVersion": 1,
   "taskId": "task_root_verify",
-  "executionId": "project_1785398513291",
+  "executionId": "project_1785399180593",
   "capabilityId": "seo.canonical",
   "ruleId": "seo.canonical.exists",
   "treeHash": "mock-tree-hash",
@@ -11,6 +11,6 @@
   "capabilityVersion": "1.0.0",
   "frameworkSdkVersion": "1.0.0",
   "passed": true,
-  "output": "Canonical absolute URL verified: http://localhost:59876/",
-  "timestamp": "2026-07-30T08:01:53.351Z"
+  "output": "Canonical absolute URL verified: http://localhost:60323/",
+  "timestamp": "2026-07-30T08:13:00.677Z"
 }

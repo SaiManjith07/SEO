@@ -1,8 +1,8 @@
 {
-  "id": "ev_performance.audit_bundle-validator_1785398513355",
+  "id": "ev_performance.audit_bundle-validator_1785399180680",
   "schemaVersion": 1,
   "taskId": "task_root_verify",
-  "executionId": "project_1785398513291",
+  "executionId": "project_1785399180593",
   "capabilityId": "performance.audit",
   "ruleId": "performance.bundle.size",
   "treeHash": "mock-tree-hash",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": true,
   "output": "Script tags count (0) is within target limit (8).",
-  "timestamp": "2026-07-30T08:01:53.355Z"
+  "timestamp": "2026-07-30T08:13:00.680Z"
 }

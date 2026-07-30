@@ -9,7 +9,7 @@ import { compressionValidator } from './validators/compression.js';
 
 export const performancePlugin: PlatformPlugin = {
   id: 'performance',
-  version: '0.1.0',
+  version: '1.0.0',
   capabilities: [
     {
       id: 'performance.audit',

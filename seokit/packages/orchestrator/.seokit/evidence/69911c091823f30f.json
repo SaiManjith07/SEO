@@ -1,8 +1,8 @@
 {
-  "id": "ev_accessibility.audit_accessibility-aria-interactive-validator_1785398513360",
+  "id": "ev_accessibility.audit_accessibility-aria-interactive-validator_1785399180684",
   "schemaVersion": 1,
   "taskId": "task_root_verify",
-  "executionId": "project_1785398513291",
+  "executionId": "project_1785399180593",
   "capabilityId": "accessibility.audit",
   "ruleId": "accessibility.aria.interactive",
   "treeHash": "mock-tree-hash",
@@ -12,5 +12,5 @@
   "frameworkSdkVersion": "1.0.0",
   "passed": true,
   "output": "All custom interactive element ARIA and focus configurations are valid.",
-  "timestamp": "2026-07-30T08:01:53.360Z"
+  "timestamp": "2026-07-30T08:13:00.684Z"
 }

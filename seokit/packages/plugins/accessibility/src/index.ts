@@ -9,7 +9,7 @@ import { imageAltValidator } from './validators/image.js';
 
 export const accessibilityPlugin: PlatformPlugin = {
   id: 'accessibility',
-  version: '0.1.0',
+  version: '1.0.0',
   capabilities: [
     {
       id: 'accessibility.audit',

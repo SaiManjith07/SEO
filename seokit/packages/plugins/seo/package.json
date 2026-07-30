@@ -1,6 +1,6 @@
 {
   "name": "@seokit/plugin-seo",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "SEOKit SEO Plugin",
   "type": "module",
   "main": "dist/index.js",

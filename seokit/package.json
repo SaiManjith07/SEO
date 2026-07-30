@@ -1,7 +1,7 @@
 {
   "name": "seokit-monorepo",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Build-time SEO tooling for AI-era search. One rule engine, many adapters.",
   "scripts": {
     "build": "pnpm -r build",

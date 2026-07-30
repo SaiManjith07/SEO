@@ -10,7 +10,7 @@ import { geoQuotesValidator } from './validators/quotes.js';
 
 export const geoPlugin: PlatformPlugin = {
   id: 'geo',
-  version: '0.1.0',
+  version: '1.0.0',
   capabilities: [
     {
       id: 'geo.audit',

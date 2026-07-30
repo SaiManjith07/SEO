@@ -8,7 +8,7 @@ import { aeoExtractabilityValidator } from './validators/extractability.js';
 
 export const aeoPlugin: PlatformPlugin = {
   id: 'aeo',
-  version: '0.1.0',
+  version: '1.0.0',
   capabilities: [
     {
       id: 'aeo.audit',
