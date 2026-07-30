@@ -1,6 +1,6 @@
 {
   "name": "@seokit/core",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Framework-agnostic SEO/AEO/GEO rule engine.",
   "type": "module",
   "main": "./dist/index.js",
@@ -10,6 +10,9 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
+  },
+  "bin": {
+    "seokit": "./dist/cli.js"
   },
   "files": ["dist"],
   "scripts": {
@@ -29,7 +32,12 @@
   "devDependencies": {
     "typescript": "^5.6.0",
     "vitest": "^2.1.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "@seokit/plugin-seo": "workspace:*",
+    "@seokit/plugin-performance": "workspace:*",
+    "@seokit/plugin-accessibility": "workspace:*",
+    "@seokit/plugin-aeo": "workspace:*",
+    "@seokit/plugin-geo": "workspace:*"
   },
   "license": "MIT"
 }

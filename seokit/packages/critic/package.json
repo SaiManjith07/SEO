@@ -1,6 +1,6 @@
 {
   "name": "@seokit/critic",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Independent SEO/GEO verification against published benchmarks. Emits a reward signal.",
   "type": "module",
   "main": "./dist/index.js",

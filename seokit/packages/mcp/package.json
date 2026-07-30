@@ -1,6 +1,6 @@
 {
   "name": "@seokit/mcp",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "MCP server exposing SEOKit rules to IDE agents.",
   "type": "module",
   "bin": { "seokit-mcp": "./dist/index.js" },

@@ -1,0 +1,16 @@
+{
+  "id": "ev_seo.schema_schema-validator_1785399180678",
+  "schemaVersion": 1,
+  "taskId": "task_root_verify",
+  "executionId": "project_1785399180593",
+  "capabilityId": "seo.schema",
+  "ruleId": "seo.schema.valid",
+  "treeHash": "mock-tree-hash",
+  "ruleVersion": "1.0.0",
+  "validatorVersion": "1.0.0",
+  "capabilityVersion": "1.0.0",
+  "frameworkSdkVersion": "1.0.0",
+  "passed": false,
+  "output": "No JSON-LD structured data blocks found on the page.",
+  "timestamp": "2026-07-30T08:13:00.678Z"
+}

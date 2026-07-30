@@ -1,0 +1,16 @@
+{
+  "id": "ev_accessibility.audit_accessibility-form-labels-validator_1785399180683",
+  "schemaVersion": 1,
+  "taskId": "task_root_verify",
+  "executionId": "project_1785399180593",
+  "capabilityId": "accessibility.audit",
+  "ruleId": "accessibility.form.labels",
+  "treeHash": "mock-tree-hash",
+  "ruleVersion": "1.0.0",
+  "validatorVersion": "1.0.0",
+  "capabilityVersion": "1.0.0",
+  "frameworkSdkVersion": "1.0.0",
+  "passed": true,
+  "output": "All form controls are correctly bound to accessible text labels.",
+  "timestamp": "2026-07-30T08:13:00.683Z"
+}

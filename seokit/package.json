@@ -1,13 +1,16 @@
 {
   "name": "seokit-monorepo",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Build-time SEO tooling for AI-era search. One rule engine, many adapters.",
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "mcp": "pnpm --filter @seokit/mcp start"
+    "lint": "pnpm -r typecheck",
+    "mcp": "pnpm --filter @seokit/mcp start",
+    "coder-mcp": "pnpm --filter @seokit/coder-mcp start",
+    "orchestrate": "pnpm --filter @seokit/orchestrator start"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

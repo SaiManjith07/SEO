@@ -266,3 +266,160 @@ export function extractabilityScore(
     breakdown,
   };
 }
+
+// ---------------------------------------------------------------------------
+// AEO Depth: Chunk-level Suitability & Entity Density
+// ---------------------------------------------------------------------------
+
+export interface AeoChunk {
+  heading: string;
+  level: number;
+  content: string;
+}
+
+export interface ChunkScore {
+  wordCount: number;
+  questionHead: boolean;
+  bluffScore: number;
+  pronounDensity: number;
+  evidenceCount: number;
+  suitabilityScore: number;
+}
+
+import * as cheerio from 'cheerio';
+
+export function extractChunks(html: string): AeoChunk[] {
+  const $ = cheerio.load(html);
+  const chunks: AeoChunk[] = [];
+  let currentChunk: any = null;
+
+  $('body').find('*').each((_, el) => {
+    const tagName = el.name;
+    const isHeading = /^(h1|h2|h3|h4|h5|h6)$/i.test(tagName);
+
+    if (isHeading) {
+      if (currentChunk) {
+        currentChunk.content = currentChunk.content.trim().replace(/\s+/g, ' ');
+        chunks.push(currentChunk);
+      }
+      currentChunk = {
+        heading: $(el).text().trim(),
+        level: parseInt(tagName.substring(1), 10),
+        content: '',
+      };
+    } else {
+      if (currentChunk && el.children && el.children.length > 0) {
+        const directText = $(el).contents().filter((_, child) => child.type === 'text').text().trim();
+        if (directText) {
+          currentChunk.content += ' ' + directText;
+        }
+      }
+    }
+  });
+
+  if (currentChunk) {
+    currentChunk.content = currentChunk.content.trim().replace(/\s+/g, ' ');
+    chunks.push(currentChunk);
+  }
+
+  if (chunks.length === 0) {
+    const bodyText = $('body').text().trim().replace(/\s+/g, ' ');
+    if (bodyText) {
+      chunks.push({
+        heading: 'Introduction',
+        level: 1,
+        content: bodyText,
+      });
+    }
+  }
+
+  return chunks;
+}
+
+export function scoreChunk(chunk: AeoChunk): ChunkScore {
+  const words = chunk.content.split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+
+  const questionHead = chunk.heading.trim().endsWith('?') ||
+    /^(how|what|why|when|where|which|who|can|should|is|are|does|do)\b/i.test(chunk.heading.trim());
+
+  // BLUFF score: first sentence hedges search
+  const sentences = chunk.content.split(/[.!?]+/);
+  const firstSentence = (sentences[0] || '').trim();
+  const hedges = /\b(in today's|in this article|we will|let's|welcome to|it depends|there are many)\b/i;
+  const bluffScore = hedges.test(firstSentence) ? 40 : 100;
+
+  const pronouns = chunk.content.match(PRONOUN_RE) ?? [];
+  const pronounDensity = wordCount > 0 ? parseFloat(((pronouns.length / wordCount) * 100).toFixed(2)) : 0;
+
+  const numbers = chunk.content.match(/\b\d+(\.\d+)?\s?(%|percent|x\b)|\b\d{2,}\b/g) ?? [];
+  const evidenceCount = numbers.length;
+
+  // Suitability calculation
+  let suitabilityScore = 20; // baseline
+  if (questionHead) suitabilityScore += 20;
+  if (wordCount >= 100 && wordCount <= 250) suitabilityScore += 40;
+  else if (wordCount >= 50 && wordCount < 100) suitabilityScore += 20;
+  if (pronounDensity < 4) suitabilityScore += 20;
+
+  return {
+    wordCount,
+    questionHead,
+    bluffScore,
+    pronounDensity,
+    evidenceCount,
+    suitabilityScore: Math.min(100, suitabilityScore),
+  };
+}
+
+export function calculateEntityDensity(text: string): {
+  nouns: string[];
+  pronouns: string[];
+  ratio: number;
+  densityScore: number;
+} {
+  const pronouns = text.match(PRONOUN_RE) ?? [];
+  const properNouns: string[] = [];
+
+  const sentences = text.split(/[.!?]+/);
+  for (const sentence of sentences) {
+    const trimmed = sentence.trim();
+    if (!trimmed) continue;
+    
+    const words = trimmed.split(/\s+/);
+    const candidateWords = words.slice(1);
+    for (const w of candidateWords) {
+      const clean = w.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+      if (clean && /^[A-Z][a-z0-9]/.test(clean) && !PRONOUN_RE.test(clean)) {
+        properNouns.push(clean);
+      }
+    }
+  }
+
+  const commonEntities = [
+    'Google', 'ChatGPT', 'Gemini', 'Perplexity', 'SEO', 'AEO', 'GEO', 
+    'SSR', 'INP', 'LCP', 'CLS', 'CWV', 'JSON-LD', 'Schema', 'HTML',
+    'Nextjs', 'Next.js', 'Astro', 'Nuxt', 'SvelteKit', 'Remix'
+  ];
+  const words = text.split(/\s+/);
+  for (const w of words) {
+    const clean = w.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+    if (commonEntities.includes(clean) || commonEntities.includes(w.trim())) {
+      properNouns.push(clean);
+    }
+  }
+
+  const uniqueNouns = Array.from(new Set(properNouns));
+  const ratio = uniqueNouns.length / (pronouns.length + 1);
+
+  let densityScore = 40;
+  if (ratio >= 1.5) densityScore = 100;
+  else if (ratio >= 0.8) densityScore = 70;
+
+  return {
+    nouns: uniqueNouns,
+    pronouns,
+    ratio: parseFloat(ratio.toFixed(2)),
+    densityScore,
+  };
+}

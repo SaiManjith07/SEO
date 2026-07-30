@@ -1,0 +1,101 @@
+[
+  {
+    "id": 1,
+    "projectId": 1,
+    "score": 1,
+    "pagesCrawled": 5,
+    "errorsCount": 1,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T05:41:12.830Z"
+  },
+  {
+    "id": 2,
+    "projectId": 1,
+    "score": 1,
+    "pagesCrawled": 5,
+    "errorsCount": 4,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T05:41:13.088Z"
+  },
+  {
+    "id": 3,
+    "projectId": 1,
+    "score": 1,
+    "pagesCrawled": 5,
+    "errorsCount": 1,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T05:49:15.538Z"
+  },
+  {
+    "id": 4,
+    "projectId": 1,
+    "score": 1,
+    "pagesCrawled": 5,
+    "errorsCount": 4,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T05:49:15.868Z"
+  },
+  {
+    "id": 5,
+    "projectId": 1,
+    "score": 1,
+    "pagesCrawled": 5,
+    "errorsCount": 1,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T05:49:23.464Z"
+  },
+  {
+    "id": 6,
+    "projectId": 1,
+    "score": 1,
+    "pagesCrawled": 5,
+    "errorsCount": 4,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T05:49:23.698Z"
+  },
+  {
+    "id": 7,
+    "projectId": 1,
+    "score": 1,
+    "pagesCrawled": 5,
+    "errorsCount": 1,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T05:49:23.862Z"
+  },
+  {
+    "id": 8,
+    "projectId": 1,
+    "score": 0,
+    "pagesCrawled": 5,
+    "errorsCount": 26,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T06:01:45.097Z"
+  },
+  {
+    "id": 9,
+    "projectId": 1,
+    "score": 1,
+    "pagesCrawled": 5,
+    "errorsCount": 4,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T06:01:45.209Z"
+  },
+  {
+    "id": 10,
+    "projectId": 1,
+    "score": 0,
+    "pagesCrawled": 5,
+    "errorsCount": 26,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T06:02:27.331Z"
+  },
+  {
+    "id": 11,
+    "projectId": 1,
+    "score": 1,
+    "pagesCrawled": 5,
+    "errorsCount": 4,
+    "warningsCount": 0,
+    "createdAt": "2026-07-30T06:02:27.476Z"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "id": "ev_accessibility.audit_heading-hierarchy-validator_1785399180683",
+  "schemaVersion": 1,
+  "taskId": "task_root_verify",
+  "executionId": "project_1785399180593",
+  "capabilityId": "accessibility.audit",
+  "ruleId": "accessibility.heading.hierarchy",
+  "treeHash": "mock-tree-hash",
+  "ruleVersion": "1.0.0",
+  "validatorVersion": "1.0.0",
+  "capabilityVersion": "1.0.0",
+  "frameworkSdkVersion": "1.0.0",
+  "passed": true,
+  "output": "Heading element flow conforms to strict semantic hierarchy requirements.",
+  "timestamp": "2026-07-30T08:13:00.683Z"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "ev_geo.audit_geo-citation-validator_1785399180914",
+  "schemaVersion": 1,
+  "taskId": "task_ver_fail",
+  "executionId": "p-ver-fail",
+  "capabilityId": "geo.audit",
+  "ruleId": "geo.citation.markup",
+  "treeHash": "mock-tree-hash",
+  "ruleVersion": "1.0.0",
+  "validatorVersion": "1.0.0",
+  "capabilityVersion": "1.0.0",
+  "frameworkSdkVersion": "1.0.0",
+  "passed": false,
+  "output": "GEO check failed: Missing outbound citation hyperlinks.",
+  "timestamp": "2026-07-30T08:13:00.914Z",
+  "fixPlan": {
+    "ruleId": "geo.citation.markup",
+    "description": "Missing authoritative external links or citation sources.",
+    "suggestedFix": "Incorporate external hyperlinks referencing reputable primary sources."
+  }
+}

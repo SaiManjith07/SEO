@@ -1,6 +1,6 @@
 {
   "name": "@seokit/critic-mcp",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "MCP server that independently grades sites against published benchmarks and emits a reward signal.",
   "type": "module",
   "bin": { "seokit-critic": "./dist/index.js" },

@@ -1,0 +1,21 @@
+{
+  "id": "ev_geo.audit_geo-knowledge-validator_1785399180688",
+  "schemaVersion": 1,
+  "taskId": "task_root_verify",
+  "executionId": "project_1785399180593",
+  "capabilityId": "geo.audit",
+  "ruleId": "geo.knowledge.sameas",
+  "treeHash": "mock-tree-hash",
+  "ruleVersion": "1.0.0",
+  "validatorVersion": "1.0.0",
+  "capabilityVersion": "1.0.0",
+  "frameworkSdkVersion": "1.0.0",
+  "passed": false,
+  "output": "GEO check failed: Missing structured sameAs links mapping entities to official KG records.",
+  "timestamp": "2026-07-30T08:13:00.688Z",
+  "fixPlan": {
+    "ruleId": "geo.knowledge.sameas",
+    "description": "Missing sameAs references linking entities to the Knowledge Graph.",
+    "suggestedFix": "Incorporate Wikidata, Wikipedia, or official social profile links in sameAs schema array."
+  }
+}
