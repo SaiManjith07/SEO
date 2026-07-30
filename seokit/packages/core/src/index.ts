@@ -67,3 +67,11 @@ export * from './platform/plugins.js';
 export * from './platform/policy.js';
 export * from './platform/certification.js';
 export * from './platform/bootstrap.js';
+export * from './platform/config.js';
+export * from './platform/cache.js';
+export * from './platform/ai.js';
+export * from './platform/fixer.js';
+
+
+
+

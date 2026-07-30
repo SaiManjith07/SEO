@@ -1,11 +1,13 @@
 #!/usr/bin/env node
+import * as fs from 'fs';
+import * as path from 'path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { WorkspaceManager } from '@seokit/workspace';
 import { EventBus } from '@seokit/events';
 import { VerificationOrchestrator } from '@seokit/orchestrator';
-import { DiagnosticMapper } from '@seokit/diagnostics';
+import { DiagnosticMapper, ReportGenerator } from '@seokit/diagnostics';
 import { PluginRegistry } from '@seokit/core';
 
 // Import capability plugins to trigger self-registration
@@ -14,10 +16,12 @@ import '@seokit/plugin-performance';
 import '@seokit/plugin-accessibility';
 import '@seokit/plugin-aeo';
 import '@seokit/plugin-geo';
+import '@seokit/plugin-security';
+import '@seokit/plugin-structured-data';
 
-const server = new McpServer({
-  name: 'seokit-v2',
-  version: '2.0.0'
+export const server = new McpServer({
+  name: 'seokit-v3',
+  version: '3.0.0'
 });
 
 const wsManager = new WorkspaceManager();
@@ -42,7 +46,7 @@ server.registerTool(
     try {
       const session = await orchestrator.createSession({
         workspaceRoot: workspacePath,
-        plugins: ['seo', 'performance', 'accessibility', 'aeo', 'geo'],
+        plugins: ['seo', 'performance', 'accessibility', 'aeo', 'geo', 'security', 'structured-data'],
         options: {}
       });
 
@@ -50,6 +54,29 @@ server.registerTool(
       await orchestrator.closeSession(session.id);
 
       const diagnostics = DiagnosticMapper.mapCollection(evidences, workspacePath);
+
+      // Generate reports in all 5 formats
+      const durationMs = 1500;
+      const pagesCount = new Set(evidences.map(e => e.sourcePath).filter(Boolean)).size || 1;
+      const reportObj = ReportGenerator.createReport(evidences, durationMs, pagesCount);
+
+      const seokitDir = path.resolve(workspacePath, '.seokit');
+      const reportsDir = path.join(seokitDir, 'reports');
+      const historyDir = path.join(seokitDir, 'history');
+
+      fs.mkdirSync(reportsDir, { recursive: true });
+      fs.mkdirSync(historyDir, { recursive: true });
+
+      fs.writeFileSync(path.join(reportsDir, 'report.json'), ReportGenerator.exportToJson(reportObj));
+      fs.writeFileSync(path.join(reportsDir, 'report.md'), ReportGenerator.exportToMarkdown(reportObj));
+      fs.writeFileSync(path.join(reportsDir, 'report.html'), ReportGenerator.exportToHtml(reportObj));
+      fs.writeFileSync(path.join(reportsDir, 'report.pdf'), ReportGenerator.exportToPdf(reportObj));
+      fs.writeFileSync(path.join(reportsDir, 'report.sarif'), ReportGenerator.exportToSarif(reportObj));
+
+      // Save to run history timeline logs
+      const timestampStr = new Date().toISOString().replace(/:/g, '-');
+      fs.writeFileSync(path.join(historyDir, `${timestampStr}.json`), ReportGenerator.exportToJson(reportObj));
+
       const report = { evidences, diagnostics };
       lastReportJson = JSON.stringify(report, null, 2);
 
@@ -75,7 +102,7 @@ server.registerTool(
     try {
       const session = await orchestrator.createSession({
         workspaceRoot: workspacePath,
-        plugins: ['seo', 'performance', 'accessibility', 'aeo', 'geo'],
+        plugins: ['seo', 'performance', 'accessibility', 'aeo', 'geo', 'security', 'structured-data'],
         options: { targetFile: filePath }
       });
 
@@ -232,9 +259,134 @@ server.registerResource(
   }
 );
 
-// --- Expose MCP Prompts ---
+// I. Audit Website Prompt
+server.registerPrompt(
+  'audit_website',
+  {
+    title: 'Audit Website SEO & Core Web Vitals',
+    description: 'Runs workspace audits and reports violations.',
+    argsSchema: {
+      workspacePath: z.string().describe('Absolute folder path of the workspace.')
+    }
+  },
+  async (args) => {
+    return {
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: `Run an SEO verification audit on the workspace path: "${args.workspacePath}". List all errors and suggestions.`
+          }
+        }
+      ]
+    };
+  }
+);
 
-// I. Explain Issue Prompt
+// II. Fix SEO Prompt
+server.registerPrompt(
+  'fix_seo',
+  {
+    title: 'Fix SEO Violation',
+    description: 'Apply code optimizations matching failed rules.',
+    argsSchema: {
+      filePath: z.string().describe('Absolute path to the target file.'),
+      fixType: z.string().describe('Type of fix: title, description, canonical, or schema.')
+    }
+  },
+  async (args) => {
+    return {
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: `Optimize and apply a "${args.fixType}" fix on file "${args.filePath}".`
+          }
+        }
+      ]
+    };
+  }
+);
+
+// III. Generate Content Prompt
+server.registerPrompt(
+  'generate_content',
+  {
+    title: 'Generate Content Draft',
+    description: 'Generates SEO optimized text content draft.',
+    argsSchema: {
+      topic: z.string().describe('Topic theme.'),
+      keywords: z.string().describe('Comma-separated list of target keywords.')
+    }
+  },
+  async (args) => {
+    return {
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: `Write a high-quality article draft on topic "${args.topic}" focusing on target keywords: "${args.keywords}".`
+          }
+        }
+      ]
+    };
+  }
+);
+
+// IV. Analyze Competitor Prompt
+server.registerPrompt(
+  'analyze_competitor',
+  {
+    title: 'Analyze Competitor Search Gaps',
+    description: 'Compares search presence against a competitor URL.',
+    argsSchema: {
+      competitorUrl: z.string().describe('The competitor web site address.')
+    }
+  },
+  async (args) => {
+    return {
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: `Identify content gaps and backlink opportunities comparing our site against competitor site: "${args.competitorUrl}".`
+          }
+        }
+      ]
+    };
+  }
+);
+
+// V. Keyword Research Prompt
+server.registerPrompt(
+  'keyword_research',
+  {
+    title: 'Keyword Research & Clustering',
+    description: 'Discover search terms and group them by semantic topic clusters.',
+    argsSchema: {
+      niche: z.string().describe('The industry niche or topic vertical.')
+    }
+  },
+  async (args) => {
+    return {
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: `Conduct search keyword research for the niche: "${args.niche}". Group related keywords into semantic clusters.`
+          }
+        }
+      ]
+    };
+  }
+);
+
+// Explain Issue Prompt
 server.registerPrompt(
   'explain_issue',
   {
@@ -285,6 +437,153 @@ server.registerPrompt(
   }
 );
 
+// 6. get_seo_intelligence tool
+server.registerTool(
+  'get_seo_intelligence',
+  {
+    title: 'Get SEO Intelligence',
+    description: 'Fetch and display Google Search Console, GA4, Bing Webmaster, and PageSpeed unified dashboard metrics.',
+    inputSchema: {
+      workspacePath: z.string().describe('Absolute folder path of the workspace.')
+    }
+  },
+  async ({ workspacePath }: any) => {
+    try {
+      const session = await orchestrator.createSession({
+        workspaceRoot: workspacePath,
+        plugins: ['seo'],
+        options: {}
+      });
+
+      const intel = await orchestrator.fetchSEOIntelligence(session.id);
+      await orchestrator.closeSession(session.id);
+
+      return text(JSON.stringify(intel, null, 2));
+    } catch (err: any) {
+      return text(`ERROR: Fetching SEO Intelligence failed: ${err.message}`);
+    }
+  }
+);
+
+// 7. get_ai_recommendations tool
+server.registerTool(
+  'get_ai_recommendations',
+  {
+    title: 'Get AI Recommendations',
+    description: 'Fetch AI SEO recommendations, keyword clusters, and competitor search gaps.',
+    inputSchema: {
+      workspacePath: z.string().describe('Absolute folder path of the workspace.')
+    }
+  },
+  async ({ workspacePath }: any) => {
+    try {
+      const session = await orchestrator.createSession({
+        workspaceRoot: workspacePath,
+        plugins: ['seo'],
+        options: {}
+      });
+
+      const report = await orchestrator.fetchAIReport(session.id);
+      await orchestrator.closeSession(session.id);
+
+      return text(JSON.stringify(report, null, 2));
+    } catch (err: any) {
+      return text(`ERROR: Fetching AI recommendations failed: ${err.message}`);
+    }
+  }
+);
+
+// 8. generate_seo_content tool
+server.registerTool(
+  'generate_seo_content',
+  {
+    title: 'Generate SEO Content Draft',
+    description: 'Generate an SEO-optimized content draft based on target topic and keywords.',
+    inputSchema: {
+      workspacePath: z.string().describe('Absolute folder path of the workspace.'),
+      topic: z.string().describe('The primary article topic.'),
+      keywords: z.array(z.string()).describe('Target search keywords.')
+    }
+  },
+  async ({ workspacePath, topic, keywords }: any) => {
+    try {
+      const session = await orchestrator.createSession({
+        workspaceRoot: workspacePath,
+        plugins: ['seo'],
+        options: {}
+      });
+
+      const draft = orchestrator.generateAIDraft(session.id, topic, keywords);
+      await orchestrator.closeSession(session.id);
+
+      return text(draft);
+    } catch (err: any) {
+      return text(`ERROR: Generating content draft failed: ${err.message}`);
+    }
+  }
+);
+
+// 9. apply_seo_fix tool
+server.registerTool(
+  'apply_seo_fix',
+  {
+    title: 'Apply SEO Fix',
+    description: 'Apply an automated SEO code fix to a specific file with backup snapshotting.',
+    inputSchema: {
+      workspacePath: z.string().describe('Absolute folder path of the workspace.'),
+      filePath: z.string().describe('Absolute path to the target file to modify.'),
+      fixType: z.string().describe('Type of fix: canonical, breadcrumbs, schema, title, description, alt, headings, internal-link, robots.'),
+      options: z.any().optional().describe('Extra options such as href, title, description, anchor, or schema json string.')
+    }
+  },
+  async ({ workspacePath, filePath, fixType, options }: any) => {
+    try {
+      const session = await orchestrator.createSession({
+        workspaceRoot: workspacePath,
+        plugins: ['seo'],
+        options: {}
+      });
+
+      const diff = orchestrator.proposeFix(session.id, filePath, fixType, options || {});
+      orchestrator.applyAndBackupFix(session.id, filePath, fixType, options || {});
+      await orchestrator.closeSession(session.id);
+
+      return text(`SUCCESS: Applied fix "${fixType}" on file. Diff:\n\n${diff.diffText}`);
+    } catch (err: any) {
+      return text(`ERROR: Applying SEO fix failed: ${err.message}`);
+    }
+  }
+);
+
+// 10. rollback_seo_fix tool
+server.registerTool(
+  'rollback_seo_fix',
+  {
+    title: 'Rollback SEO Fix',
+    description: 'Rollback a previously applied automated SEO fix using workspace backup snapshots.',
+    inputSchema: {
+      workspacePath: z.string().describe('Absolute folder path of the workspace.'),
+      filePath: z.string().describe('Absolute path to the target file to rollback.')
+    }
+  },
+  async ({ workspacePath, filePath }: any) => {
+    try {
+      const session = await orchestrator.createSession({
+        workspaceRoot: workspacePath,
+        plugins: ['seo'],
+        options: {}
+      });
+
+      orchestrator.restoreRollback(session.id, filePath);
+      await orchestrator.closeSession(session.id);
+
+      return text(`SUCCESS: Rolled back changes for file: ${filePath}`);
+    } catch (err: any) {
+      return text(`ERROR: Rolling back SEO fix failed: ${err.message}`);
+    }
+  }
+);
+
 // III. Suggest Fix Prompt
 server.registerPrompt(
   'suggest_fix',
@@ -318,7 +617,12 @@ async function run() {
   console.error('SEOKit v2 MCP Server running on stdio');
 }
 
-run().catch((err) => {
-  console.error('[MCP SERVER FATAL] Failed to start:', err);
-  process.exit(1);
-});
+if (process.env.NODE_ENV !== 'test') {
+  run().catch((err) => {
+    console.error('[MCP SERVER FATAL] Failed to start:', err);
+    process.exit(1);
+  });
+}
+
+export * from './registry.js';
+export * from './sdk.js';

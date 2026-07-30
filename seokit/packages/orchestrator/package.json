@@ -31,6 +31,7 @@
     "@seokit/plugin-aeo": "workspace:*",
     "@seokit/plugin-geo": "workspace:*",
     "@seokit/plugin-framework": "workspace:*",
+    "@seokit/plugin-structured-data": "workspace:*",
     "@seokit/framework-detector": "workspace:*",
     "zod": "^3.23.0"
   },

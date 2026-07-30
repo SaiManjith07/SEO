@@ -1,4 +1,5 @@
 import { WorkspaceSession } from '@seokit/workspace';
+import { SEOKitConfig } from '@seokit/core';
 
 export interface SessionConfig {
   workspaceRoot: string;
@@ -13,6 +14,7 @@ export class VerificationSession {
   public options: Record<string, any>;
   public activeTasks: Set<AbortController> = new Set();
   public frameworkMetadata?: any;
+  public loadedConfig?: SEOKitConfig;
 
   constructor(id: string, workspaceSession: WorkspaceSession, config: SessionConfig) {
     this.id = id;

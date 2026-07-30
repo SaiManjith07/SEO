@@ -61,3 +61,5 @@ export class DiagnosticMapper {
     return evidences.map(ev => this.mapEvidenceToDiagnostic(ev, uri));
   }
 }
+
+export * from './reporting.js';

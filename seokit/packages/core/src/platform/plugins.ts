@@ -33,9 +33,21 @@ export function satisfiesSemver(version: string, range: string): boolean {
   return true; 
 }
 
-export interface PlatformPlugin {
+export interface PluginManifest {
   id: string;
   version: string;
+  author?: string;
+  description?: string;
+  engines?: {
+    seokit?: string;
+  };
+  dependencies?: Record<string, string>;
+}
+
+export interface PlatformPlugin {
+  id?: string;
+  version?: string;
+  manifest?: PluginManifest;
   engines?: {
     seokit?: string;
   };
@@ -44,7 +56,39 @@ export interface PlatformPlugin {
   frameworks?: FrameworkSDK[];
   rules?: ExecutableRule[];
   initialize?: (context: any) => Promise<void>;
+  register?: (context: any) => Promise<void>;
+  dispose?: () => Promise<void>;
   unload?: () => Promise<void>;
+}
+
+export function validatePluginManifest(plugin: PlatformPlugin): void {
+  const manifest = plugin.manifest || {
+    id: plugin.id,
+    version: plugin.version,
+    engines: plugin.engines
+  };
+
+  if (!manifest.id || typeof manifest.id !== 'string') {
+    throw new Error('Invalid plugin manifest: "id" must be a non-empty string.');
+  }
+  if (!manifest.version || typeof manifest.version !== 'string') {
+    throw new Error(`Invalid plugin manifest for "${manifest.id}": "version" must be a non-empty string.`);
+  }
+
+  if (plugin.manifest) {
+    if (plugin.manifest.author && typeof plugin.manifest.author !== 'string') {
+      throw new Error(`Invalid plugin manifest for "${manifest.id}": "author" must be a string.`);
+    }
+  }
+
+  // Version Compatibility checks against running core version
+  const coreVersion = VERSION;
+  const targetEngineRange = manifest.engines?.seokit;
+  if (targetEngineRange) {
+    if (!satisfiesSemver(coreVersion, targetEngineRange)) {
+      throw new Error(`Incompatible plugin "${manifest.id}": requires SEOKit version range "${targetEngineRange}" but running core version "${coreVersion}".`);
+    }
+  }
 }
 
 export class PluginLoader {
@@ -71,16 +115,11 @@ export class PluginLoader {
   }
 
   public async loadPlugin(plugin: PlatformPlugin, context?: any): Promise<void> {
-    if (this.loadedPlugins.has(plugin.id)) {
-      return; // Already loaded
-    }
+    validatePluginManifest(plugin);
 
-    // Version Compatibility check
-    const coreVersion = VERSION;
-    if (plugin.engines?.seokit) {
-      if (!satisfiesSemver(coreVersion, plugin.engines.seokit)) {
-        throw new Error(`Plugin '${plugin.id}' requires SEOKit version '${plugin.engines.seokit}', but core version is '${coreVersion}'.`);
-      }
+    const pluginId = plugin.manifest?.id || plugin.id!;
+    if (this.loadedPlugins.has(pluginId)) {
+      return; // Already loaded
     }
 
     // Call lifecycle initialize hook
@@ -116,7 +155,12 @@ export class PluginLoader {
       }
     }
 
-    this.loadedPlugins.set(plugin.id, plugin);
+    // Call lifecycle register hook
+    if (plugin.register) {
+      await plugin.register(context || {});
+    }
+
+    this.loadedPlugins.set(pluginId, plugin);
   }
 
   public async unloadPlugin(pluginId: string): Promise<void> {
@@ -125,7 +169,10 @@ export class PluginLoader {
       return;
     }
 
-    // Call lifecycle unload hook
+    // Call lifecycle dispose/unload hooks
+    if (plugin.dispose) {
+      await plugin.dispose();
+    }
     if (plugin.unload) {
       await plugin.unload();
     }
@@ -166,33 +213,68 @@ export class PluginRegistry {
   private static plugins: PlatformPlugin[] = [];
 
   public static register(plugin: PlatformPlugin): void {
-    // 1. Strict Manifest Validation
-    if (!plugin.id || typeof plugin.id !== 'string') {
-      throw new Error('Invalid plugin manifest: "id" must be a non-empty string.');
-    }
-    if (!plugin.version || typeof plugin.version !== 'string') {
-      throw new Error(`Invalid plugin manifest for "${plugin.id}": "version" must be a non-empty string.`);
-    }
+    // 1. Strict Manifest & Schema Validation
+    validatePluginManifest(plugin);
 
-    // 2. Version Compatibility Checks
-    const coreVersion = VERSION;
-    if (plugin.engines?.seokit) {
-      if (!satisfiesSemver(coreVersion, plugin.engines.seokit)) {
-        throw new Error(`Incompatible plugin "${plugin.id}": requires SEOKit version range "${plugin.engines.seokit}" but running core version "${coreVersion}".`);
-      }
-    }
+    // 2. Dependency Audit
+    this.validateDependencies(plugin);
 
-    // 3. Lifecycle triggers
+    const pluginId = plugin.manifest?.id || plugin.id!;
+
+    // 3. Lifecycle initialization triggers
     if (plugin.initialize) {
       try {
         plugin.initialize({});
       } catch (err: any) {
-        console.error(`[PluginRegistry] initialize callback failed for plugin "${plugin.id}":`, err.message);
+        console.error(`[PluginRegistry] initialize callback failed for plugin "${pluginId}":`, err.message);
       }
     }
 
-    if (!this.plugins.some(p => p.id === plugin.id)) {
+    if (!this.plugins.some(p => (p.manifest?.id || p.id) === pluginId)) {
       this.plugins.push(plugin);
+    }
+  }
+
+  public static validateDependencies(plugin: PlatformPlugin): void {
+    const manifest = plugin.manifest || {
+      id: plugin.id!,
+      version: plugin.version!,
+      dependencies: (plugin as any).dependencies
+    };
+
+    if (manifest.dependencies) {
+      for (const [depId, depRange] of Object.entries(manifest.dependencies)) {
+        const depPlugin = this.plugins.find(p => (p.manifest?.id || p.id) === depId);
+        if (!depPlugin) {
+          throw new Error(`Plugin '${manifest.id}' missing required dependency: '${depId}'.`);
+        }
+        const depVersion = depPlugin.manifest?.version || depPlugin.version!;
+        if (!satisfiesSemver(depVersion, depRange as string)) {
+          throw new Error(`Plugin '${manifest.id}' requires dependency '${depId}' to satisfy version '${depRange}' (found version '${depVersion}').`);
+        }
+      }
+    }
+  }
+
+  public static async discoverAndRegister(): Promise<void> {
+    const firstPartyPlugins = [
+      '@seokit/plugin-seo',
+      '@seokit/plugin-performance',
+      '@seokit/plugin-accessibility',
+      '@seokit/plugin-aeo',
+      '@seokit/plugin-geo',
+      '@seokit/plugin-security',
+      '@seokit/plugin-structured-data'
+    ];
+
+    for (const pName of firstPartyPlugins) {
+      if (!this.plugins.some(p => p.id === pName || `@seokit/plugin-${p.id}` === pName || p.manifest?.id === pName)) {
+        try {
+          await import(pName);
+        } catch {
+          // Ignore if not present in the current node_modules environment
+        }
+      }
     }
   }
 

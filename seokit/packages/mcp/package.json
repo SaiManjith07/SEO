@@ -1,10 +1,11 @@
 {
   "name": "@seokit/mcp",
-  "version": "1.0.0",
-  "description": "MCP server exposing SEOKit rules to IDE agents.",
+  "version": "3.0.0",
+  "description": "SEOKit v3 Model Context Protocol (MCP) server.",
   "type": "module",
   "bin": { "seokit-mcp": "./dist/index.js" },
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -24,6 +25,8 @@
     "@seokit/plugin-accessibility": "workspace:*",
     "@seokit/plugin-aeo": "workspace:*",
     "@seokit/plugin-geo": "workspace:*",
+    "@seokit/plugin-security": "workspace:*",
+    "@seokit/plugin-structured-data": "workspace:*",
     "zod": "^3.23.0"
   },
   "devDependencies": {

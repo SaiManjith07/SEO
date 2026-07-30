@@ -116,6 +116,76 @@ export class VerificationEngine {
         source: 'performance-validator'
       };
     });
+
+    this.registerValidator('custom-selector-validator', async (context, params?: any) => {
+      if (!context.rawHtml) {
+        return { passed: false, confidence: 1.0, output: 'No raw HTML content available', source: 'custom-selector-validator' };
+      }
+      const { selector, assertion, targetAttr, expectedValue } = params || {};
+      if (!selector || !assertion) {
+        return { passed: false, confidence: 1.0, output: 'Invalid custom selector parameters: selector and assertion are required.', source: 'custom-selector-validator' };
+      }
+
+      const $ = cheerio.load(context.rawHtml);
+      const matches = $(selector);
+      const exists = matches.length > 0;
+
+      if (assertion === 'exists') {
+        return {
+          passed: exists,
+          confidence: 1.0,
+          output: exists ? `Element matching selector '${selector}' exists.` : `Element matching selector '${selector}' was not found.`,
+          source: 'custom-selector-validator'
+        };
+      }
+
+      if (assertion === 'not-exists') {
+        return {
+          passed: !exists,
+          confidence: 1.0,
+          output: !exists ? `Element matching selector '${selector}' does not exist.` : `Element matching selector '${selector}' was found.`,
+          source: 'custom-selector-validator'
+        };
+      }
+
+      if (!exists) {
+        return {
+          passed: false,
+          confidence: 1.0,
+          output: `Target element '${selector}' not found to run assertions.`,
+          source: 'custom-selector-validator'
+        };
+      }
+
+      const value = targetAttr ? (matches.first().attr(targetAttr) ?? '') : matches.first().text().trim();
+
+      if (assertion === 'equals') {
+        const passed = value === expectedValue;
+        return {
+          passed,
+          confidence: 1.0,
+          output: passed ? `Value matches expected '${expectedValue}'.` : `Value mismatch: expected '${expectedValue}', got '${value}'.`,
+          source: 'custom-selector-validator'
+        };
+      }
+
+      if (assertion === 'contains') {
+        const passed = value.includes(expectedValue || '');
+        return {
+          passed,
+          confidence: 1.0,
+          output: passed ? `Value contains expected substring '${expectedValue}'.` : `Value does not contain '${expectedValue}': got '${value}'.`,
+          source: 'custom-selector-validator'
+        };
+      }
+
+      return {
+        passed: false,
+        confidence: 1.0,
+        output: `Unsupported custom assertion: '${assertion}'.`,
+        source: 'custom-selector-validator'
+      };
+    });
   }
 
   public registerValidator(name: string, fn: ValidatorFunction): void {
@@ -179,6 +249,24 @@ export class VerificationEngine {
         ev.ruleVersion = ev.ruleVersion || VERSION;
       }
     }
+
+    // Run custom rules matching custom-selector-validator
+    const customRules = this.ruleRegistry.getRulesForCapability(capabilityId)
+      .filter(r => r.validatorName === 'custom-selector-validator');
+    for (const rule of customRules) {
+      const res = await this.verify(rule, context);
+      evidences.push({
+        passed: res.passed,
+        confidence: res.confidence,
+        output: res.output,
+        source: rule.validatorName,
+        capabilityId,
+        ruleId: rule.id,
+        ruleVersion: rule.version,
+        standard: rule.standard
+      });
+    }
+
     return evidences;
   }
 

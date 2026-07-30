@@ -6,3 +6,7 @@ export { RemoteProvider } from './remote.js';
 export { LocalDevProvider } from './localdev.js';
 export { BrowserProvider } from './browser.js';
 export { resolveProvider } from './resolver.js';
+export * from './oauth.js';
+export * from './google.js';
+export * from './bing.js';
+

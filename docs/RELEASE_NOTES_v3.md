@@ -1,6 +1,6 @@
-# SEOKit v2.0.0-rc1 Release Notes
+# SEOKit v3.0.0 Release Notes
 
-SEOKit v2 is a universal website verification platform built for speed, scalability, and AI context integration.
+SEOKit v3 is a universal website verification platform built for speed, scalability, and AI context integration.
 
 ---
 
@@ -50,7 +50,7 @@ npm install -g @seokit/mcp
 1. Open Cursor and navigate to **Settings** > **Features** > **MCP**.
 2. Click **+ Add New MCP Server**.
 3. Configure the parameters:
-   *   **Name**: `seokit-v2`
+   *   **Name**: `seokit-v3`
    *   **Type**: `command`
    *   **Command**: `npx -y @seokit/mcp`
 4. Click **Save** to enable the server tools (`verify_workspace`, `verify_page`).
