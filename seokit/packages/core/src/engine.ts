@@ -83,6 +83,9 @@ function topologicalSort(rules: Rule[]): Rule[] {
  * dependencies. If a prerequisite rule fails with errors/warnings, dependent rules are pruned.
  */
 export function runRules(ctx: Context, config?: SeoKitConfig, eventBus?: VerificationEventBus): RunResult {
+  if (config) {
+    ctx.config = config;
+  }
   const started = Date.now();
   const findings: Finding[] = [];
   const skipped: string[] = [];

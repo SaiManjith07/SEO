@@ -18,6 +18,9 @@ export class LocalExecutionProvider implements ExecutionProvider {
     config?: SeoKitConfig,
     eventBus?: VerificationEventBus
   ): Promise<RunResult> {
+    if (config) {
+      ctx.config = config;
+    }
     const scheduler = new DagRulesScheduler();
     const plan = scheduler.schedule(rules);
 
@@ -154,6 +157,9 @@ export class ThreadPoolExecutionProvider implements ExecutionProvider {
     config?: SeoKitConfig,
     eventBus?: VerificationEventBus
   ): Promise<RunResult> {
+    if (config) {
+      ctx.config = config;
+    }
     const scheduler = new DagRulesScheduler();
     const plan = scheduler.schedule(rules);
 

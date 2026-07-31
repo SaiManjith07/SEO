@@ -73,6 +73,7 @@ export interface SourceContext {
     path: string;
     content: string;
   };
+  config?: SeoKitConfig;
 }
 
 /** Runtime context for a single live page. */
@@ -91,6 +92,7 @@ export interface PageContext {
     cls?: number;
     inpMs?: number;
   };
+  config?: SeoKitConfig;
 }
 
 /** Whole-site context, produced by the crawler. */
@@ -102,6 +104,7 @@ export interface SiteContext {
   sitemapUrls: string[];
   /** url -> outbound internal links */
   linkGraph: Map<string, string[]>;
+  config?: SeoKitConfig;
 }
 
 export type Context = SourceContext | PageContext | SiteContext;
@@ -151,6 +154,13 @@ export interface SeoKitConfig {
   ignore?: string[];
   aiCrawlers?: string[];
   extends?: string[];
+  intelligence?: {
+    thinContentThreshold?: number;
+    duplicateSimilarity?: number;
+    cannibalizationSimilarity?: number;
+    orphanExclusions?: string[];
+    requiredEeatPages?: string[];
+  };
 }
 
 export interface RunResult {
