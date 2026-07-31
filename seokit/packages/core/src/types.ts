@@ -161,6 +161,38 @@ export interface SeoKitConfig {
     orphanExclusions?: string[];
     requiredEeatPages?: string[];
   };
+  aeo?: {
+    questionHeadingsRatio?: number;
+    statisticsDensityMinWordCount?: number;
+    statisticsDensityRatio?: number;
+    outboundCitationsMinWordCount?: number;
+    outboundCitationsMinCount?: number;
+    pronounDensityMinWordCount?: number;
+    pronounDensityMaxRatio?: number;
+    longParagraphsMaxParagraphCount?: number;
+    longParagraphsMaxWordCount?: number;
+    longParagraphsRatio?: number;
+    answerFirstOpeningMinWordCount?: number;
+    answerFirstOpeningWordsRange?: number;
+    minScorableWords?: number;
+    chunkSuitabilityMinWords?: number;
+    chunkSuitabilityMaxWords?: number;
+    chunkSuitabilityPronounDensity?: number;
+    entityDensityHighRatio?: number;
+    entityDensityMedRatio?: number;
+  };
+  schema?: {
+    minSameAsCount?: number;
+    parityProbeSliceLength?: number;
+    parityMinProbeLength?: number;
+  };
+  aiAccess?: {
+    minServerTextRatio?: number;
+    minServerWordCount?: number;
+  };
+  sandbox?: {
+    cpuTimeoutMs?: number;
+  };
 }
 
 export interface RunResult {

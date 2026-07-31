@@ -9,7 +9,7 @@ describe('ConfigurationProvider settings resolution', () => {
 
     expect(settings.intelligence.thinContentThreshold).toBe(200);
     expect(settings.html.maxTitleLength).toBe(60);
-    expect(settings.sandbox.cpuTimeoutMs).toBe(50);
+    expect(settings.sandbox.cpuTimeoutMs).toBe(3000);
   });
 
   it('should override global intelligence options', () => {

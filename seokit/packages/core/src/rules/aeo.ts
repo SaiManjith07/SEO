@@ -1,6 +1,7 @@
 import { defineRule } from '../engine.js';
 import { extract } from '../analyzers/extract.js';
-import type { Finding, PageContext } from '../types.js';
+import type { Finding, PageContext, SeoKitConfig } from '../types.js';
+import { ConfigurationProvider } from '../config/provider.js';
 
 /**
  * AEO / GEO rules.
@@ -22,6 +23,7 @@ export const noQuestionHeadings = defineRule<PageContext>({
     'Question-shaped headings match query phrasing and become candidate answers.',
   docs: 'See 02-AEO-answer-engine-optimization.md §4.2',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().aeo;
     const { headings } = extract(ctx.rawHtml);
     const subs = headings.filter((h) => h.level >= 2);
     if (subs.length === 0) return [];
@@ -34,7 +36,7 @@ export const noQuestionHeadings = defineRule<PageContext>({
         ),
     );
 
-    if (questions.length / subs.length >= 0.3) return [];
+    if (questions.length / subs.length >= settings.questionHeadingsRatio) return [];
 
     return [
       {
@@ -60,12 +62,13 @@ export const noStatistics = defineRule<PageContext>({
     'Adding statistics raised generative-engine visibility ~25.9% in the Princeton GEO study.',
   docs: 'https://arxiv.org/abs/2311.09735',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().aeo;
     const { text, wordCount } = extract(ctx.rawHtml);
-    if (wordCount < 200) return [];
+    if (wordCount < settings.statisticsDensityMinWordCount) return [];
 
     const numbers = text.match(/\b\d+(\.\d+)?\s?(%|percent|x\b)|\b\d{2,}\b/g) ?? [];
     const per100 = (numbers.length / wordCount) * 100;
-    if (per100 >= 0.5) return [];
+    if (per100 >= settings.statisticsDensityRatio) return [];
 
     return [
       {
@@ -89,8 +92,9 @@ export const noCitations = defineRule<PageContext>({
   needs: 'page',
   description: 'Citing authoritative sources raised visibility ~24.9% in the GEO study.',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().aeo;
     const { links, wordCount } = extract(ctx.rawHtml);
-    if (wordCount < 300) return [];
+    if (wordCount < settings.outboundCitationsMinWordCount) return [];
 
     let origin = '';
     try {
@@ -103,7 +107,7 @@ export const noCitations = defineRule<PageContext>({
       (l) => /^https?:\/\//i.test(l.href) && (!origin || !l.href.startsWith(origin)),
     );
 
-    if (external.length >= 3) return [];
+    if (external.length >= settings.outboundCitationsMinCount) return [];
 
     return [
       {
@@ -127,12 +131,13 @@ export const highPronounDensity = defineRule<PageContext>({
   description:
     'Pronoun-heavy text loses meaning once a passage is extracted out of context.',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().aeo;
     const { text, wordCount } = extract(ctx.rawHtml);
-    if (wordCount < 200) return [];
+    if (wordCount < settings.pronounDensityMinWordCount) return [];
 
     const pronouns = text.match(PRONOUN_RE) ?? [];
     const pct = (pronouns.length / wordCount) * 100;
-    if (pct < 6) return [];
+    if (pct < settings.pronounDensityMaxRatio) return [];
 
     return [
       {
@@ -156,14 +161,15 @@ export const longParagraphs = defineRule<PageContext>({
   needs: 'page',
   description: 'Dense paragraphs do not chunk cleanly for passage retrieval.',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().aeo;
     const html = ctx.rawHtml;
     const paragraphs = [...html.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)].map((m) =>
       m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
     );
-    if (paragraphs.length < 3) return [];
+    if (paragraphs.length < settings.longParagraphsMaxParagraphCount) return [];
 
-    const long = paragraphs.filter((p) => p.split(/\s+/).length > 90);
-    if (long.length / paragraphs.length < 0.3) return [];
+    const long = paragraphs.filter((p) => p.split(/\s+/).length > settings.longParagraphsMaxWordCount);
+    if (long.length / paragraphs.length < settings.longParagraphsRatio) return [];
 
     return [
       {
@@ -187,10 +193,11 @@ export const noAnswerFirstOpening = defineRule<PageContext>({
   description:
     'The first 100 words are the primary citation target and should answer directly.',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().aeo;
     const { text, wordCount } = extract(ctx.rawHtml);
-    if (wordCount < 200) return [];
+    if (wordCount < settings.answerFirstOpeningMinWordCount) return [];
 
-    const opening = text.split(/\s+/).slice(0, 60).join(' ');
+    const opening = text.split(/\s+/).slice(0, settings.answerFirstOpeningWordsRange).join(' ');
     const hedges =
       /\b(in today's|in this article|we will|let's|welcome to|it depends|there are many|before we|first,? let)\b/i;
 
@@ -233,7 +240,9 @@ export interface ExtractabilityResult {
 export function extractabilityScore(
   findings: Finding[],
   wordCount?: number,
+  config?: SeoKitConfig,
 ): ExtractabilityResult {
+  const settings = new ConfigurationProvider(config).getSettings().aeo;
   const checks = [
     'aeo/no-question-headings',
     'aeo/no-statistics',
@@ -251,11 +260,11 @@ export function extractabilityScore(
     if (ok) passed++;
   }
 
-  if (wordCount !== undefined && wordCount < MIN_SCORABLE_WORDS) {
+  if (wordCount !== undefined && wordCount < settings.minScorableWords) {
     return {
       score: null,
       applicable: false,
-      reason: `Only ${wordCount} words of text — need at least ${MIN_SCORABLE_WORDS} to score meaningfully.`,
+      reason: `Only ${wordCount} words of text — need at least ${settings.minScorableWords} to score meaningfully.`,
       breakdown,
     };
   }

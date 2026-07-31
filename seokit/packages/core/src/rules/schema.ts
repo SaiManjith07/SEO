@@ -1,6 +1,7 @@
 import { defineRule } from '../engine.js';
 import { extract, flattenJsonLd, schemaTypes } from '../analyzers/extract.js';
 import type { Finding, PageContext } from '../types.js';
+import { ConfigurationProvider } from '../config/provider.js';
 
 export const noStructuredData = defineRule<PageContext>({
   id: 'schema/none-present',
@@ -86,6 +87,7 @@ export const organizationMissingSameAs = defineRule<PageContext>({
   needs: 'page',
   description: 'Organization schema without sameAs loses entity disambiguation.',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().schema;
     const nodes = flattenJsonLd(extract(ctx.rawHtml).jsonLd);
     const findings: Finding[] = [];
     for (const node of nodes) {
@@ -95,7 +97,7 @@ export const organizationMissingSameAs = defineRule<PageContext>({
         (Array.isArray(type) && type.includes('Organization'));
       if (!isOrg) continue;
       const sameAs = node['sameAs'];
-      if (Array.isArray(sameAs) && sameAs.length >= 2) continue;
+      if (Array.isArray(sameAs) && sameAs.length >= settings.minSameAsCount) continue;
       findings.push({
         ruleId: 'schema/organization-missing-sameas',
         severity: 'warning',
@@ -118,6 +120,7 @@ export const contentParity = defineRule<PageContext>({
   description:
     'FAQPage answers must appear in the visible page text (spammy structured data policy).',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().schema;
     const page = extract(ctx.rawHtml);
     const nodes = flattenJsonLd(page.jsonLd);
     const findings: Finding[] = [];
@@ -139,9 +142,9 @@ export const contentParity = defineRule<PageContext>({
           .replace(/<[^>]+>/g, ' ')
           .replace(/\s+/g, ' ')
           .trim()
-          .slice(0, 40)
+          .slice(0, settings.parityProbeSliceLength)
           .toLowerCase();
-        if (probe.length < 15) continue;
+        if (probe.length < settings.parityMinProbeLength) continue;
 
         if (!haystack.includes(probe)) {
           findings.push({

@@ -1,4 +1,5 @@
-import type { Rule, Finding, Context } from './types.js';
+import type { Rule, Finding, Context, SeoKitConfig } from './types.js';
+import { ConfigurationProvider } from './config/provider.js';
 
 export interface PluginRuntimeOptions {
   memoryLimitMb?: number;
@@ -8,7 +9,7 @@ export interface PluginRuntimeOptions {
 }
 
 export class PluginRuntime {
-  constructor(private options: PluginRuntimeOptions = {}) {}
+  constructor(private options: PluginRuntimeOptions = {}, private config?: SeoKitConfig) {}
 
   /** Run a plugin rule within safety constraints and performance bounds */
   async runRuleIsolated(rule: Rule, ctx: Context): Promise<Finding[]> {
@@ -29,7 +30,8 @@ export class PluginRuntime {
     }
 
     // 3. Isolated execution with CPU timeout control
-    const timeoutMs = this.options.cpuTimeoutMs || 3000; // default 3 seconds
+    const settings = new ConfigurationProvider(this.config || ctx.config).getSettings();
+    const timeoutMs = this.options.cpuTimeoutMs || settings.sandbox.cpuTimeoutMs;
     
     return new Promise<Finding[]>((resolve, reject) => {
       let isSettled = false;

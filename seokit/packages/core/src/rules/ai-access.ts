@@ -1,6 +1,7 @@
 import { defineRule } from '../engine.js';
 import { extract } from '../analyzers/extract.js';
 import type { Finding, PageContext, SiteContext } from '../types.js';
+import { ConfigurationProvider } from '../config/provider.js';
 
 /**
  * The differentiating rules. No mainstream SEO tool surfaces these well.
@@ -31,6 +32,7 @@ export const clientSideOnlyContent = defineRule<PageContext>({
     'Content present only after JS execution is invisible to ChatGPT, Claude and Perplexity.',
   docs: 'See 04-technical-requirements.md §2',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().aiAccess;
     if (!ctx.renderedHtml) return []; // nothing to diff against
 
     const raw = extract(ctx.rawHtml);
@@ -41,7 +43,7 @@ export const clientSideOnlyContent = defineRule<PageContext>({
     // Word-count ratio is the blunt but reliable signal.
     const ratio = rendered.wordCount === 0 ? 1 : raw.wordCount / rendered.wordCount;
 
-    if (ratio < 0.5) {
+    if (ratio < settings.minServerTextRatio) {
       const hiddenPct = Math.round((1 - ratio) * 100);
       findings.push({
         ruleId: 'ai-access/client-side-only-content',
@@ -90,8 +92,9 @@ export const emptyServerResponse = defineRule<PageContext>({
   needs: 'page',
   description: 'The server response contains almost no text — a classic SPA shell.',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().aiAccess;
     const raw = extract(ctx.rawHtml);
-    if (raw.wordCount >= 50) return [];
+    if (raw.wordCount >= settings.minServerWordCount) return [];
     return [
       {
         ruleId: 'ai-access/empty-server-response',
