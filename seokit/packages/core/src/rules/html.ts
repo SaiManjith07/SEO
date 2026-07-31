@@ -1,6 +1,7 @@
 import { defineRule } from '../engine.js';
 import { extract } from '../analyzers/extract.js';
 import type { Finding, PageContext } from '../types.js';
+import { ConfigurationProvider } from '../config/provider.js';
 
 const D = 'https://developers.google.com/search/docs';
 
@@ -32,17 +33,18 @@ export const titleLength = defineRule<PageContext>({
   severity: 'warning',
   needs: 'page',
   dependencies: ['html/missing-title'],
-  description: 'Titles longer than ~60 characters get truncated in results.',
+  description: 'Titles longer than expected characters get truncated in results.',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().html;
     const { title } = extract(ctx.rawHtml);
     if (!title) return [];
-    if (title.length <= 60) return [];
+    if (title.length <= settings.maxTitleLength) return [];
     return [
       {
         ruleId: 'html/title-length',
         severity: 'warning',
         message: `Title is ${title.length} characters; it will likely be truncated.`,
-        fix: 'Shorten to under 60 characters, front-loading the most important words.',
+        fix: `Shorten to under ${settings.maxTitleLength} characters, front-loading the most important words.`,
         location: { url: ctx.url },
         evidence: { title },
       },
@@ -57,6 +59,7 @@ export const missingMetaDescription = defineRule<PageContext>({
   needs: 'page',
   description: 'Meta descriptions influence click-through rate.',
   check(ctx) {
+    const settings = new ConfigurationProvider(ctx.config).getSettings().html;
     const { metaDescription } = extract(ctx.rawHtml);
     if (metaDescription) return [];
     return [
@@ -64,7 +67,7 @@ export const missingMetaDescription = defineRule<PageContext>({
         ruleId: 'html/missing-meta-description',
         severity: 'warning',
         message: 'Page has no meta description.',
-        fix: 'Add <meta name="description" content="..."> of 120–160 characters describing what the page answers.',
+        fix: `Add <meta name="description" content="..."> of ${settings.minMetaDescriptionLength}–${settings.maxMetaDescriptionLength} characters describing what the page answers.`,
         location: { url: ctx.url },
       },
     ];

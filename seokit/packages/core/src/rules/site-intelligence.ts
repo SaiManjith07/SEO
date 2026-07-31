@@ -1,6 +1,7 @@
 import { defineRule } from '../engine.js';
 import { extract } from '../analyzers/extract.js';
 import type { Finding, SiteContext } from '../types.js';
+import { ConfigurationProvider } from '../config/provider.js';
 
 /**
  * Calculates Jaccard token similarity between two strings.
@@ -42,8 +43,8 @@ export const keywordCannibalization = defineRule<SiteContext>({
   description: 'Detects if multiple pages target highly similar keywords/titles.',
   check(ctx) {
     const findings: Finding[] = [];
-    const config = ctx.config?.intelligence;
-    const similarityThreshold = config?.cannibalizationSimilarity ?? 0.85;
+    const settings = new ConfigurationProvider(ctx.config).getSettings().intelligence;
+    const similarityThreshold = settings.cannibalizationSimilarity;
 
     // Build page data maps
     const pageData = ctx.pages.map((page) => {
@@ -128,8 +129,8 @@ export const orphanPages = defineRule<SiteContext>({
   description: 'Identify pages with no incoming internal links.',
   check(ctx) {
     const findings: Finding[] = [];
-    const config = ctx.config?.intelligence;
-    const exclusions = config?.orphanExclusions || [];
+    const settings = new ConfigurationProvider(ctx.config).getSettings().intelligence;
+    const exclusions = settings.orphanExclusions;
     const inbound = new Set<string>();
 
     for (const links of ctx.linkGraph.values()) {
@@ -200,8 +201,8 @@ export const thinContent = defineRule<SiteContext>({
   description: 'Find pages with thin textual content.',
   check(ctx) {
     const findings: Finding[] = [];
-    const config = ctx.config?.intelligence;
-    const defaultThreshold = config?.thinContentThreshold ?? 200;
+    const settings = new ConfigurationProvider(ctx.config).getSettings().intelligence;
+    const defaultThreshold = settings.thinContentThreshold;
 
     for (const page of ctx.pages) {
       const parsed = extract(page.rawHtml);
@@ -240,8 +241,8 @@ export const duplicateContent = defineRule<SiteContext>({
   description: 'Identify similar or identical text contents served across URLs.',
   check(ctx) {
     const findings: Finding[] = [];
-    const config = ctx.config?.intelligence;
-    const duplicateThreshold = config?.duplicateSimilarity ?? 0.85;
+    const settings = new ConfigurationProvider(ctx.config).getSettings().intelligence;
+    const duplicateThreshold = settings.duplicateSimilarity;
 
     // Filter pages and extract text
     const pageTexts = ctx.pages
@@ -305,8 +306,8 @@ export const eeatTrustPages = defineRule<SiteContext>({
   description: 'Verifies the presence of crucial E-E-A-T trust signals (About, Contact, Privacy policy).',
   check(ctx) {
     const findings: Finding[] = [];
-    const config = ctx.config?.intelligence;
-    const requiredPages = config?.requiredEeatPages || ['about', 'contact', 'privacy', 'terms'];
+    const settings = new ConfigurationProvider(ctx.config).getSettings().intelligence;
+    const requiredPages = settings.requiredEeatPages;
     const urls = ctx.pages.map((p) => p.url.toLowerCase());
 
     // 1. Trust Pages Validation

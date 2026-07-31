@@ -78,6 +78,7 @@ export * from './execution.js';
 export * from './incremental.js';
 export * from './sandbox.js';
 export * from './scheduler.js';
+export * from './config/provider.js';
 
 
 
