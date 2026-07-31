@@ -29,7 +29,15 @@ export {
   RETRIEVAL_BOTS,
   TRAINING_BOTS,
   parseRobots,
+  clientSideOnlyContent,
+  emptyServerResponse,
+  blockedAiCrawlers,
+  llmsTxtPresence,
 } from './rules/ai-access.js';
+export {
+  imageDimensions,
+  imageLazyLoading,
+} from './rules/performance.js';
 
 // Scaffolding & Memory Exports
 export { detectFramework } from './scaffold/detector.js';
@@ -54,6 +62,7 @@ import './rules/ai-access.js';
 import './rules/schema.js';
 import './rules/aeo.js';
 import './rules/site-intelligence.js';
+import './rules/performance.js';
 
 // Platform Exports
 export * from './platform/store.js';
@@ -79,7 +88,4 @@ export * from './incremental.js';
 export * from './sandbox.js';
 export * from './scheduler.js';
 export * from './config/provider.js';
-
-
-
-
+export * from './tracking/index.js';

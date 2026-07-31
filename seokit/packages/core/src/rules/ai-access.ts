@@ -143,6 +143,27 @@ export const blockedAiCrawlers = defineRule<SiteContext>({
   },
 });
 
+export const llmsTxtPresence = defineRule<SiteContext>({
+  id: 'ai-access/llms-txt-presence',
+  category: 'ai-access',
+  severity: 'info',
+  needs: 'site',
+  description: 'Optional provision of /llms.txt for LLM crawlers.',
+  docs: 'See 08-llmo.md § STD-33',
+  check(ctx) {
+    if (ctx.llmsTxt) return [];
+    return [
+      {
+        ruleId: 'ai-access/llms-txt-presence',
+        severity: 'info',
+        message: 'No /llms.txt found at the site root.',
+        fix: 'Create an /llms.txt file containing markdown-formatted descriptions of the website structure and content for LLMs. This is a proposed standard with currently low adoption, but it represents a best practice for LLMO.',
+        location: { url: `${ctx.origin}/llms.txt` },
+      },
+    ];
+  },
+});
+
 /**
  * Minimal robots.txt parser — good enough for the "blocked entirely" check.
  *

@@ -95,15 +95,17 @@ export interface PageContext {
   config?: SeoKitConfig;
 }
 
-/** Whole-site context, produced by the crawler. */
 export interface SiteContext {
   kind: 'site';
   origin: string;
   pages: PageContext[];
   robotsTxt: string | null;
+  llmsTxt: string | null;
   sitemapUrls: string[];
   /** url -> outbound internal links */
   linkGraph: Map<string, string[]>;
+  /** Computed internal PageRank scores */
+  pageRanks?: Map<string, number>;
   config?: SeoKitConfig;
 }
 
@@ -192,6 +194,13 @@ export interface SeoKitConfig {
   };
   sandbox?: {
     cpuTimeoutMs?: number;
+  };
+  tracking?: {
+    retentionDays?: number;
+    comparisonWindowDays?: number;
+    alertPositionDropThreshold?: number;
+    alertPositionImproveThreshold?: number;
+    alertCtrDropThreshold?: number;
   };
 }
 

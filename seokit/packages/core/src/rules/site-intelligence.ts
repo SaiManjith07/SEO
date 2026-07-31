@@ -353,3 +353,49 @@ export const eeatTrustPages = defineRule<SiteContext>({
     return findings;
   }
 });
+
+/**
+ * Flags important pages that have extremely low internal PageRank.
+ */
+export const internalEquityStarvation = defineRule<SiteContext>({
+  id: 'site/internal-equity-starvation',
+  category: 'technical',
+  severity: 'warning',
+  needs: 'site',
+  description: 'Identifies high-priority pages suffering from internal link equity starvation.',
+  check(ctx) {
+    const findings: Finding[] = [];
+    if (!ctx.pageRanks || ctx.pageRanks.size === 0) return findings;
+
+    const settings = new ConfigurationProvider(ctx.config).getSettings().intelligence;
+    const requiredPages = settings.requiredEeatPages;
+    
+    // Calculate 10th percentile rank
+    const ranks = Array.from(ctx.pageRanks.values()).sort((a, b) => a - b);
+    const p10Index = Math.floor(ranks.length * 0.1);
+    const p10Threshold = ranks[p10Index] || 0;
+
+    for (const page of ctx.pages) {
+      const url = page.url.toLowerCase();
+      const rank = ctx.pageRanks.get(page.url) || 0;
+      
+      // Is this a high priority page? (e.g. required EEAT page)
+      const isHighPriority = requiredPages.some(pageType => 
+        url.includes(`/${pageType}`) || url.includes(`/${pageType}-us`)
+      );
+
+      if (isHighPriority && rank <= p10Threshold) {
+        findings.push({
+          ruleId: 'site/internal-equity-starvation',
+          severity: 'warning',
+          message: `Internal Equity Starvation: High-priority page "${page.url}" has an exceptionally low internal PageRank (bottom 10%).`,
+          fix: 'Increase internal linking to this page from high-authority pages (e.g., homepage or footer) to distribute link equity properly.',
+          location: { url: page.url },
+          evidence: { rank, p10Threshold }
+        });
+      }
+    }
+
+    return findings;
+  }
+});

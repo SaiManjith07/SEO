@@ -99,6 +99,25 @@ export class ConfigurationProvider {
       }
     }
 
+    // 7. Merge Tracking settings
+    if (userConfig.tracking) {
+      if (typeof userConfig.tracking.retentionDays === 'number') {
+        merged.tracking.retentionDays = userConfig.tracking.retentionDays;
+      }
+      if (typeof userConfig.tracking.comparisonWindowDays === 'number') {
+        merged.tracking.comparisonWindowDays = userConfig.tracking.comparisonWindowDays;
+      }
+      if (typeof userConfig.tracking.alertPositionDropThreshold === 'number') {
+        merged.tracking.alertPositionDropThreshold = userConfig.tracking.alertPositionDropThreshold;
+      }
+      if (typeof userConfig.tracking.alertPositionImproveThreshold === 'number') {
+        merged.tracking.alertPositionImproveThreshold = userConfig.tracking.alertPositionImproveThreshold;
+      }
+      if (typeof userConfig.tracking.alertCtrDropThreshold === 'number') {
+        merged.tracking.alertCtrDropThreshold = userConfig.tracking.alertCtrDropThreshold;
+      }
+    }
+
     return merged;
   }
 

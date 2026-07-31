@@ -48,6 +48,28 @@ export interface AiAccessSettings {
   minServerWordCount: number;
 }
 
+export interface TrackingSettings {
+  retentionDays: number;
+  comparisonWindowDays: number;
+  alertPositionDropThreshold: number;
+  alertPositionImproveThreshold: number;
+  alertCtrDropThreshold: number;
+}
+
+export interface LifecycleSettings {
+  highImpressionThreshold: number;
+  positionRange: [number, number];
+  cadenceMonths: Record<string, number>;
+  exclusions: string[];
+}
+
+export interface OutreachSettings {
+  minDomainRating: number;
+  brandName: string;
+  targetCompetitors: string[];
+  outreachPersona: string;
+}
+
 export interface SeoKitSettings {
   intelligence: IntelligenceSettings;
   html: HtmlSettings;
@@ -55,6 +77,9 @@ export interface SeoKitSettings {
   aeo: AeoSettings;
   schema: SchemaSettings;
   aiAccess: AiAccessSettings;
+  tracking: TrackingSettings;
+  lifecycle: LifecycleSettings;
+  outreach: OutreachSettings;
 }
 
 export const DEFAULT_SETTINGS: SeoKitSettings = {
@@ -101,5 +126,34 @@ export const DEFAULT_SETTINGS: SeoKitSettings = {
   aiAccess: {
     minServerTextRatio: 0.5,
     minServerWordCount: 50
+  },
+  tracking: {
+    retentionDays: 365,
+    comparisonWindowDays: 7,
+    alertPositionDropThreshold: 3,
+    alertPositionImproveThreshold: 3,
+    alertCtrDropThreshold: 0.05
+  },
+  lifecycle: {
+    highImpressionThreshold: 1000,
+    positionRange: [4, 15],
+    cadenceMonths: {
+      documentation: 6,
+      news: 1,
+      tutorials: 6,
+      product: 3,
+      blog: 12,
+      faq: 6,
+      legal: 12,
+      commercial: 3,
+      evergreen: 12
+    },
+    exclusions: ['/archive/', '/seasonal/', '/noindex/']
+  },
+  outreach: {
+    minDomainRating: 30,
+    brandName: 'SEOKit',
+    targetCompetitors: ['CompetitorA', 'CompetitorB'],
+    outreachPersona: 'Professional yet conversational, focusing on mutual value.'
   }
 };

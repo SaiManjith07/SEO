@@ -7,6 +7,7 @@ import type {
   Severity,
 } from './types.js';
 import { VerificationEventBus } from './events.js';
+import { startSpan } from './platform/tracing.js';
 
 /**
  * The rule registry. Rules self-register at import time via `defineRule`,
@@ -83,6 +84,9 @@ function topologicalSort(rules: Rule[]): Rule[] {
  * dependencies. If a prerequisite rule fails with errors/warnings, dependent rules are pruned.
  */
 export function runRules(ctx: Context, config?: SeoKitConfig, eventBus?: VerificationEventBus): RunResult {
+  const runSpan = startSpan('engine-run-rules');
+  runSpan.setAttribute('context.kind', ctx.kind);
+  
   if (config) {
     ctx.config = config;
   }
@@ -138,6 +142,10 @@ export function runRules(ctx: Context, config?: SeoKitConfig, eventBus?: Verific
       eventBus.publish('RuleStarted', { ruleId: rule.id }).catch(() => {});
     }
 
+    const ruleSpan = startSpan(`rule-${rule.id}`);
+    ruleSpan.setAttribute('rule.category', rule.category);
+    ruleSpan.setAttribute('rule.severity', severity);
+
     try {
       const ruleFindings = rule.check(ctx);
       let ruleFailed = false;
@@ -184,8 +192,12 @@ export function runRules(ctx: Context, config?: SeoKitConfig, eventBus?: Verific
           findingsCount: 1
         }).catch(() => {});
       }
+    } finally {
+      ruleSpan.end();
     }
   }
+
+  runSpan.end();
 
   return {
     findings,

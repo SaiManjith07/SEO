@@ -1,5 +1,7 @@
 import * as cheerio from 'cheerio';
-import { fetchPage, fetchRobotsTxt } from './fetch.js';
+import { fetchPage, fetchRobotsTxt, fetchLlmsTxt } from './fetch.js';
+import { calculatePageRank } from '../analyzers/pagerank.js';
+import { startSpan } from '../platform/tracing.js';
 import type { SiteContext, PageContext } from '../types.js';
 
 const ASSET_EXTENSIONS = [
@@ -23,16 +25,22 @@ export async function crawlSite(
   maxPages: number = 10,
   render: boolean = false
 ): Promise<SiteContext> {
-  const start = new URL(startUrl);
-  const origin = start.origin;
+  const crawlSpan = startSpan('crawl-site');
+  crawlSpan.setAttribute('startUrl', startUrl);
+  crawlSpan.setAttribute('maxPages', maxPages);
+
+  try {
+    const start = new URL(startUrl);
+    const origin = start.origin;
   
   const visited = new Set<string>();
   const queue: string[] = [start.toString()];
   const pages: PageContext[] = [];
   const linkGraph = new Map<string, string[]>();
   
-  // 1. Fetch robots.txt and sitemap references
+  // 1. Fetch robots.txt, llms.txt and sitemap references
   const robotsTxt = await fetchRobotsTxt(origin);
+  const llmsTxt = await fetchLlmsTxt(origin);
   const sitemapUrls: string[] = [];
   
   if (robotsTxt) {
@@ -88,12 +96,20 @@ export async function crawlSite(
     }
   }
 
+  // 3. Compute PageRank
+  const pageRanks = calculatePageRank(linkGraph);
+
   return {
     kind: 'site',
     origin,
     pages,
     robotsTxt,
+    llmsTxt,
     sitemapUrls,
     linkGraph,
+    pageRanks,
   };
+  } finally {
+    crawlSpan.end();
+  }
 }

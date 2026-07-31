@@ -15,6 +15,18 @@ export interface VerificationEventMap {
   CacheMiss: { filePath: string; ruleId: string };
   PluginLoaded: { pluginId: string };
   PluginFailed: { pluginId: string; error: string };
+  TrackingAlertTriggered: { alert: import('./tracking/types').AlertEvent };
+  TrackingStarted: { keyword: string; date: string; providerName: string };
+  TrackingCompleted: { keyword: string; date: string; providerName: string };
+  TrackingFailed: { keyword: string; date: string; providerName: string; error: string };
+  SnapshotStored: { snapshotId: string; keyword: string };
+  ProviderUnavailable: { providerName: string; error: string };
+  ProviderRecovered: { providerName: string };
+  ContentDecayDetected: { url: string; keyword: string; lastUpdated: string; reason: string };
+  RefreshDraftGenerated: { url: string; draftContent: string };
+  OpportunityDiscovered: { url: string; type: string; score: number };
+  OutreachDraftGenerated: { url: string; draftContent: string };
+  LinkStatusChanged: { url: string; status: string };
 }
 
 export type VerificationEventKey = keyof VerificationEventMap;

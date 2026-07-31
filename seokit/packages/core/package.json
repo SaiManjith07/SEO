@@ -14,30 +14,35 @@
   "bin": {
     "seokit": "./dist/cli.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
     "cheerio": "^1.0.0"
   },
   "peerDependencies": {
     "playwright": "^1.47.0"
   },
   "peerDependenciesMeta": {
-    "playwright": { "optional": true }
+    "playwright": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "typescript": "^5.6.0",
-    "vitest": "^2.1.0",
-    "@types/node": "^22.0.0",
-    "@seokit/plugin-seo": "workspace:*",
-    "@seokit/plugin-performance": "workspace:*",
     "@seokit/plugin-accessibility": "workspace:*",
     "@seokit/plugin-aeo": "workspace:*",
-    "@seokit/plugin-geo": "workspace:*"
+    "@seokit/plugin-geo": "workspace:*",
+    "@seokit/plugin-performance": "workspace:*",
+    "@seokit/plugin-seo": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
   },
   "license": "MIT"
 }

@@ -109,3 +109,16 @@ export async function fetchRobotsTxt(origin: string): Promise<string | null> {
     return null;
   }
 }
+
+/** Fetch llms.txt for an origin. Returns null on any failure. */
+export async function fetchLlmsTxt(origin: string): Promise<string | null> {
+  try {
+    const res = await fetch(new URL('/llms.txt', origin).toString(), {
+      headers: { 'user-agent': USER_AGENTS.browser },
+    });
+    if (!res.ok) return null;
+    return await res.text();
+  } catch {
+    return null;
+  }
+}
