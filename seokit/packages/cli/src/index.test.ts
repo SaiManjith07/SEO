@@ -59,4 +59,27 @@ describe('SEOKit v2 Platform CLI Integrations', () => {
     process.exit = originalExit;
     expect(exitMock).toHaveBeenCalled();
   });
+
+  it('should create log file and record steps during verify run', async () => {
+    const originalArgv = process.argv;
+    const originalExit = process.exit;
+
+    process.argv = ['node', 'seokit', 'verify', tempDir];
+    
+    const exitMock = vi.fn();
+    // @ts-ignore
+    process.exit = exitMock as any;
+
+    await main();
+
+    process.argv = originalArgv;
+    process.exit = originalExit;
+
+    const logFile = path.join(tempDir, '.seokit', 'logs', 'verification.log');
+    expect(fs.existsSync(logFile)).toBe(true);
+
+    const logs = fs.readFileSync(logFile, 'utf-8');
+    expect(logs).toContain('SEOKit Verification Started');
+    expect(logs).toContain('--- Final Verification Summary ---');
+  });
 });

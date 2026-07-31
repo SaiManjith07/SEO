@@ -240,18 +240,33 @@ Usage:
 
   console.log(`[CLI] Launching SEOKit v2 platform run against: ${target}`);
 
+  const seokitDir = path.resolve(target, '.seokit');
+  const logsDir = path.join(seokitDir, 'logs');
+  fs.mkdirSync(logsDir, { recursive: true });
+  const logFile = path.join(logsDir, 'verification.log');
+
+  const writeToLog = (msg: string) => {
+    fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${msg}\n`, 'utf-8');
+  };
+
+  writeToLog(`SEOKit Verification Started against: ${target}`);
+
   const wsManager = new WorkspaceManager();
   const eventBus = new EventBus();
   const orchestrator = new VerificationOrchestrator(wsManager, eventBus);
 
   // Subscribe to central EventBus to stream updates live to terminal
   eventBus.subscribe('ProgressEvent', (ev) => {
-    console.log(`[Progress ${ev.payload.percent}%] ${ev.payload.message}`);
+    const msg = `[Progress ${ev.payload.percent}%] ${ev.payload.message}`;
+    console.log(msg);
+    writeToLog(msg);
   });
 
   eventBus.subscribe('RuleCompleted', (ev) => {
     const status = ev.payload.passed ? '✓ PASS' : '✗ FAIL';
-    console.log(`  ${status} | Page: ${ev.payload.page} | Rule: ${ev.payload.ruleId}`);
+    const msg = `  ${status} | Page: ${ev.payload.page} | Rule: ${ev.payload.ruleId}`;
+    console.log(msg);
+    writeToLog(msg);
   });
 
   const startTime = Date.now();
@@ -266,18 +281,24 @@ Usage:
     const evidences = await orchestrator.runVerification(session.id);
 
     console.log('\n--- Mapped IDE Diagnostics ---');
+    writeToLog('--- Mapped IDE Diagnostics ---');
     const diagnostics = DiagnosticMapper.mapCollection(evidences, target);
     diagnostics.forEach(diag => {
       const lineNum = diag.range.start.line + 1;
       const charNum = diag.range.start.character + 1;
       const statusIcon = diag.severity === 'error' ? '✗ ERROR' : '⚠ WARN';
-      console.log(`${statusIcon} | Line ${lineNum}:${charNum} | ${diag.message}`);
+      const msg = `${statusIcon} | Line ${lineNum}:${charNum} | ${diag.message}`;
+      console.log(msg);
+      writeToLog(msg);
     });
 
     console.log('\n--- Final Verification Summary ---');
+    writeToLog('--- Final Verification Summary ---');
     const passedCount = evidences.filter(e => e.passed).length;
     const failedCount = evidences.filter(e => !e.passed).length;
-    console.log(`Total checks: ${evidences.length} | Passed: ${passedCount} | Failed: ${failedCount}`);
+    const summaryMsg = `Total checks: ${evidences.length} | Passed: ${passedCount} | Failed: ${failedCount}`;
+    console.log(summaryMsg);
+    writeToLog(summaryMsg);
 
     // Generate unified report model and export files
     const durationMs = Date.now() - startTime;
@@ -311,9 +332,16 @@ Usage:
         const prevReport = JSON.parse(prevContent);
         const delta = ReportGenerator.compareReports(report, prevReport);
         console.log('\n--- Historical Trend Comparison ---');
-        console.log(`  Score Progress: ${delta.scoreChange >= 0 ? '+' : ''}${delta.scoreChange}%`);
-        console.log(`  Issues Resolved: ${delta.fixedIssues.length}`);
-        console.log(`  New Issues Found: ${delta.newIssues.length}`);
+        writeToLog('--- Historical Trend Comparison ---');
+        const progressStr = `  Score Progress: ${delta.scoreChange >= 0 ? '+' : ''}${delta.scoreChange}%`;
+        const resolvedStr = `  Issues Resolved: ${delta.fixedIssues.length}`;
+        const newStr = `  New Issues Found: ${delta.newIssues.length}`;
+        console.log(progressStr);
+        console.log(resolvedStr);
+        console.log(newStr);
+        writeToLog(progressStr);
+        writeToLog(resolvedStr);
+        writeToLog(newStr);
       } catch (err) {
         // Fail comparison gracefully
       }
@@ -408,6 +436,9 @@ Usage:
     process.exit(failedCount > 0 ? 1 : 0);
   } catch (err: any) {
     console.error(`[CLI ERROR] Verification run failed:`, err.message);
+    if (typeof writeToLog === 'function') {
+      writeToLog(`[CLI ERROR] Verification run failed: ${err.message}`);
+    }
     process.exit(1);
   }
 }
