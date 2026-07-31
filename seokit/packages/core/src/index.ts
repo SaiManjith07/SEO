@@ -76,6 +76,7 @@ export * from './events.js';
 export * from './execution.js';
 export * from './incremental.js';
 export * from './sandbox.js';
+export * from './scheduler.js';
 
 
 

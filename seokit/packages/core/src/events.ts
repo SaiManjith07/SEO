@@ -7,7 +7,14 @@ export interface VerificationEventMap {
   FindingCreated: { finding: Finding };
   AiRecommendationGenerated: { ruleId: string; recommendation: string };
   FixApplied: { file: string; ruleId: string; success: boolean };
-  ReportGenerated: { format: string; path: string };
+  VerificationCompleted: { durationMs: number; findingsCount: number };
+  VerificationFailed: { error: string };
+  RuleSkipped: { ruleId: string; reason: string };
+  RuleFailed: { ruleId: string; error: string };
+  CacheHit: { filePath: string; ruleId: string };
+  CacheMiss: { filePath: string; ruleId: string };
+  PluginLoaded: { pluginId: string };
+  PluginFailed: { pluginId: string; error: string };
 }
 
 export type VerificationEventKey = keyof VerificationEventMap;

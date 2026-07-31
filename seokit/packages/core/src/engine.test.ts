@@ -429,15 +429,16 @@ describe('SEOKit v4 Enterprise Foundation Upgrades', () => {
     const analyzer = new IncrementalAnalyzer();
     const filePath = 'index.html';
     const content = '<html><head><title>Test</title></head></html>';
+    const ruleId = 'technical/title';
     const mockFindings = [{ ruleId: 'test', severity: 'warning' as const, message: 'test finding' }];
 
-    analyzer.setCache(filePath, content, mockFindings);
+    analyzer.setCache(filePath, content, ruleId, mockFindings);
 
-    const cached = analyzer.getCachedFindings(filePath, content);
+    const cached = analyzer.getCachedFindings(filePath, content, ruleId);
     expect(cached).toEqual(mockFindings);
 
     const modifiedContent = '<html><head><title>Modified</title></head></html>';
-    const modifiedCache = analyzer.getCachedFindings(filePath, modifiedContent);
+    const modifiedCache = analyzer.getCachedFindings(filePath, modifiedContent, ruleId);
     expect(modifiedCache).toBeNull();
   });
 
