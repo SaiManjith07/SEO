@@ -4,6 +4,40 @@ Build-time SEO, performance, and accessibility validation tooling designed for A
 
 ---
 
+## Architecture & Workflows
+
+```mermaid
+graph TD
+    A[Developer writes code] --> B(Cursor / Antigravity / Claude)
+    B -->|Model Context Protocol| C[SEOKit v3 Engine]
+    C -->|Plugins Registry| D[Accessibility / Structured Data / AEO / Technical SEO]
+    C -->|Log Stream| E[.seokit/logs/verification.log]
+    C -->|Audit Reports| F[.seokit/reports/report.json]
+```
+
+---
+
+## CLI Execution Preview
+
+```text
+$ seokit verify
+
+[CLI] Launching SEOKit v3 platform run against: C:\workspace\my-app
+[Progress 20%] Acquiring raw resources...
+[Progress 100%] Verification sweep complete.
+
+--- Mapped IDE Diagnostics ---
+✗ ERROR | Line 12:4 | Canonical link tag is missing.
+⚠ WARN  | Line 48:8 | Images are missing alternative description attributes.
+
+--- Final Verification Summary ---
+Total checks: 23 | Passed: 21 | Failed: 2
+
+[SEOKit] Exporters successfully created audit reports in: .seokit/reports
+```
+
+---
+
 ## Capabilities
 
 1.  **Unified SEO & AEO verification**: Audits technical tags, JSON-LD schemas, Princeton GEO factors, and accessibility guidelines.
