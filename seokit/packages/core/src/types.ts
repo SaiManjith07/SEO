@@ -123,6 +123,8 @@ export interface Rule<C extends Context = Context> {
   /** Link into the research pack or external docs */
   docs?: string;
   check(ctx: C): Finding[];
+  /** Rules that must pass (no errors or warnings) before this rule runs */
+  dependencies?: string[];
 }
 
 export interface RuleOverride {

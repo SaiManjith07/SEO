@@ -31,6 +31,7 @@ export const titleLength = defineRule<PageContext>({
   category: 'technical',
   severity: 'warning',
   needs: 'page',
+  dependencies: ['html/missing-title'],
   description: 'Titles longer than ~60 characters get truncated in results.',
   check(ctx) {
     const { title } = extract(ctx.rawHtml);
@@ -108,6 +109,7 @@ export const headingOrder = defineRule<PageContext>({
   category: 'technical',
   severity: 'warning',
   needs: 'page',
+  dependencies: ['html/missing-h1'],
   description: 'Heading levels must not skip (h2 -> h4).',
   check(ctx) {
     const { headings } = extract(ctx.rawHtml);

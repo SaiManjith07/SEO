@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { runRules, extract, extractabilityScore } from './index.js';
+import { runRules, extract, extractabilityScore, registerRule } from './index.js';
 import type { PageContext } from './types.js';
 
 function page(html: string, overrides: Partial<PageContext> = {}): PageContext {
@@ -324,5 +324,64 @@ describe('Platform Hardening - Lifecycles, Compatibility, & Reports', () => {
     const sarifReport = await reportEngine.generateReport(taskId, 'sarif');
     expect(JSON.parse(sarifReport).runs[0].tool.driver.name).toBe('SEOKit Platform');
     expect(JSON.parse(sarifReport).runs[0].results.length).toBe(1);
+  });
+});
+
+describe('SEOKit v4 Rule Dependency Graph (DAG)', () => {
+  it('should skip executing child rules if parent rule fails', () => {
+    const BAD_HTML = '<html><head></head><body><h1>Hello</h1></body></html>';
+    const { findings, skipped } = runRules(page(BAD_HTML));
+
+    // html/missing-title should fail
+    const titleFinding = findings.find((f) => f.ruleId === 'html/missing-title');
+    expect(titleFinding).toBeDefined();
+
+    // html/title-length should be skipped because its dependency html/missing-title failed
+    expect(skipped).toContain('html/title-length');
+  });
+
+  it('should execute child rules if parent rule passes', () => {
+    const OVERLONG_TITLE_HTML = `<html>
+      <head>
+        <title>This is an extremely long title that will exceed the 60 characters threshold check in seokit rules</title>
+      </head>
+      <body>
+        <h1>Hello</h1>
+      </body>
+    </html>`;
+    const { findings, skipped } = runRules(page(OVERLONG_TITLE_HTML));
+
+    // html/missing-title should pass
+    const missingTitleFinding = findings.find((f) => f.ruleId === 'html/missing-title');
+    expect(missingTitleFinding).toBeUndefined();
+
+    // html/title-length should run and fail (length > 60)
+    const lengthFinding = findings.find((f) => f.ruleId === 'html/title-length');
+    expect(lengthFinding).toBeDefined();
+    expect(skipped).not.toContain('html/title-length');
+  });
+
+  it('should detect circular dependencies and throw error during rule execution', () => {
+    registerRule({
+      id: 'test/circular-a',
+      category: 'technical',
+      severity: 'error',
+      needs: 'page',
+      dependencies: ['test/circular-b'],
+      description: 'Circular A',
+      check: () => []
+    });
+
+    registerRule({
+      id: 'test/circular-b',
+      category: 'technical',
+      severity: 'error',
+      needs: 'page',
+      dependencies: ['test/circular-a'],
+      description: 'Circular B',
+      check: () => []
+    });
+
+    expect(() => runRules(page('<html></html>'))).toThrow('Circular dependency detected');
   });
 });
