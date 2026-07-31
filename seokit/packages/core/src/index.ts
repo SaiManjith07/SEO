@@ -2,6 +2,7 @@ export * from './types.js';
 export {
   defineRule,
   registerRule,
+  unregisterRule,
   getRules,
   getRule,
   runRules,
@@ -71,6 +72,10 @@ export * from './platform/config.js';
 export * from './platform/cache.js';
 export * from './platform/ai.js';
 export * from './platform/fixer.js';
+export * from './events.js';
+export * from './execution.js';
+export * from './incremental.js';
+export * from './sandbox.js';
 
 
 

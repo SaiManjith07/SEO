@@ -1,5 +1,16 @@
-import { describe, it, expect } from 'vitest';
-import { runRules, extract, extractabilityScore, registerRule } from './index.js';
+import { describe, it, expect, vi } from 'vitest';
+import {
+  runRules,
+  extract,
+  extractabilityScore,
+  registerRule,
+  unregisterRule,
+  VerificationEventBus,
+  LocalExecutionProvider,
+  ThreadPoolExecutionProvider,
+  IncrementalAnalyzer,
+  PluginRuntime
+} from './index.js';
 import type { PageContext } from './types.js';
 
 function page(html: string, overrides: Partial<PageContext> = {}): PageContext {
@@ -382,6 +393,81 @@ describe('SEOKit v4 Rule Dependency Graph (DAG)', () => {
       check: () => []
     });
 
-    expect(() => runRules(page('<html></html>'))).toThrow('Circular dependency detected');
+    try {
+      expect(() => runRules(page('<html></html>'))).toThrow('Circular dependency detected');
+    } finally {
+      unregisterRule('test/circular-a');
+      unregisterRule('test/circular-b');
+    }
+  });
+});
+
+describe('SEOKit v4 Enterprise Foundation Upgrades', () => {
+  it('VerificationEventBus should publish and subscribe to lifecycle events', async () => {
+    const bus = new VerificationEventBus();
+    const mockCallback = vi.fn();
+    bus.subscribe('VerificationStarted', mockCallback);
+
+    const ctx = page('<html></html>');
+    await bus.publish('VerificationStarted', { context: ctx });
+    expect(mockCallback).toHaveBeenCalledWith({ context: ctx });
+  });
+
+  it('ExecutionProviders should run rules correctly', async () => {
+    const local = new LocalExecutionProvider();
+    const thread = new ThreadPoolExecutionProvider();
+    const ctx = page('<html></html>');
+
+    const localResult = await local.execute([], ctx);
+    const threadResult = await thread.execute([], ctx);
+
+    expect(localResult.findings).toBeDefined();
+    expect(threadResult.findings).toBeDefined();
+  });
+
+  it('IncrementalAnalyzer should cache findings based on file hashes', () => {
+    const analyzer = new IncrementalAnalyzer();
+    const filePath = 'index.html';
+    const content = '<html><head><title>Test</title></head></html>';
+    const mockFindings = [{ ruleId: 'test', severity: 'warning' as const, message: 'test finding' }];
+
+    analyzer.setCache(filePath, content, mockFindings);
+
+    const cached = analyzer.getCachedFindings(filePath, content);
+    expect(cached).toEqual(mockFindings);
+
+    const modifiedContent = '<html><head><title>Modified</title></head></html>';
+    const modifiedCache = analyzer.getCachedFindings(filePath, modifiedContent);
+    expect(modifiedCache).toBeNull();
+  });
+
+  it('PluginRuntime should isolate rule execution and handle timeouts/crashes', async () => {
+    const runtime = new PluginRuntime({ cpuTimeoutMs: 50 });
+
+    const normalRule = {
+      id: 'test/normal',
+      category: 'technical' as const,
+      severity: 'error' as const,
+      needs: 'page' as const,
+      description: 'Normal check',
+      check: () => []
+    };
+
+    const findings = await runtime.runRuleIsolated(normalRule, page('<html></html>'));
+    expect(findings).toEqual([]);
+
+    const slowRule = {
+      id: 'test/slow',
+      category: 'technical' as const,
+      severity: 'error' as const,
+      needs: 'page' as const,
+      description: 'Slow check',
+      check: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        return [];
+      }
+    };
+
+    await expect(runtime.runRuleIsolated(slowRule, page('<html></html>'))).rejects.toThrow('exceeded execution limit');
   });
 });

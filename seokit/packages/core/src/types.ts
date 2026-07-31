@@ -125,6 +125,18 @@ export interface Rule<C extends Context = Context> {
   check(ctx: C): Finding[];
   /** Rules that must pass (no errors or warnings) before this rule runs */
   dependencies?: string[];
+  
+  // v4 Metadata expansion
+  name?: string;
+  tags?: string[];
+  estimatedCost?: 'low' | 'high';
+  timeout?: number;
+  cacheable?: boolean;
+  fixable?: boolean;
+  guidelineVersion?: string;
+  experimental?: boolean;
+  deprecated?: boolean;
+  condition?: (ctx: C) => boolean;
 }
 
 export interface RuleOverride {

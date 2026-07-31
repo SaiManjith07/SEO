@@ -6,6 +6,7 @@ import type {
   SeoKitConfig,
   Severity,
 } from './types.js';
+import { VerificationEventBus } from './events.js';
 
 /**
  * The rule registry. Rules self-register at import time via `defineRule`,
@@ -23,6 +24,10 @@ export function defineRule<C extends Context>(rule: Rule<C>): Rule<C> {
 
 export function registerRule(rule: Rule): void {
   registry.set(rule.id, rule);
+}
+
+export function unregisterRule(id: string): void {
+  registry.delete(id);
 }
 
 export function getRules(): Rule[] {
@@ -77,11 +82,15 @@ function topologicalSort(rules: Rule[]): Rule[] {
  * Run every rule whose `needs` matches the context kind, respecting topological
  * dependencies. If a prerequisite rule fails with errors/warnings, dependent rules are pruned.
  */
-export function runRules(ctx: Context, config?: SeoKitConfig): RunResult {
+export function runRules(ctx: Context, config?: SeoKitConfig, eventBus?: VerificationEventBus): RunResult {
   const started = Date.now();
   const findings: Finding[] = [];
   const skipped: string[] = [];
   let rulesRun = 0;
+
+  if (eventBus) {
+    eventBus.publish('VerificationStarted', { context: ctx }).catch(() => {});
+  }
 
   const sortedRules = topologicalSort([...registry.values()]);
   const failedRules = new Set<string>();
@@ -98,6 +107,12 @@ export function runRules(ctx: Context, config?: SeoKitConfig): RunResult {
       continue;
     }
 
+    // Conditional execution check
+    if (rule.condition && !rule.condition(ctx)) {
+      skipped.push(rule.id);
+      continue;
+    }
+
     // Check if any prerequisite has failed
     const deps = rule.dependencies || [];
     let hasFailedDep = false;
@@ -110,18 +125,28 @@ export function runRules(ctx: Context, config?: SeoKitConfig): RunResult {
 
     if (hasFailedDep) {
       skipped.push(rule.id);
-      failedRules.add(rule.id); // Cascade pruning
+      failedRules.add(rule.id); // Cascade pruning (Failure propagation)
       continue;
     }
 
     rulesRun++;
+
+    if (eventBus) {
+      eventBus.publish('RuleStarted', { ruleId: rule.id }).catch(() => {});
+    }
 
     try {
       const ruleFindings = rule.check(ctx);
       let ruleFailed = false;
       for (const finding of ruleFindings) {
         const resolvedSev = severity as Finding['severity'];
-        findings.push({ ...finding, severity: resolvedSev });
+        const fullFinding = { ...finding, severity: resolvedSev };
+        findings.push(fullFinding);
+
+        if (eventBus) {
+          eventBus.publish('FindingCreated', { finding: fullFinding }).catch(() => {});
+        }
+
         if (resolvedSev === 'error' || resolvedSev === 'warning') {
           ruleFailed = true;
         }
@@ -129,15 +154,33 @@ export function runRules(ctx: Context, config?: SeoKitConfig): RunResult {
       if (ruleFailed) {
         failedRules.add(rule.id);
       }
+
+      if (eventBus) {
+        eventBus.publish('RuleCompleted', {
+          ruleId: rule.id,
+          passed: !ruleFailed,
+          findingsCount: ruleFindings.length
+        }).catch(() => {});
+      }
     } catch (err) {
-      findings.push({
+      const infoFinding: Finding = {
         ruleId: rule.id,
         severity: 'info',
         message: `Rule "${rule.id}" threw: ${
           err instanceof Error ? err.message : String(err)
         }`,
-      });
+      };
+      findings.push(infoFinding);
       failedRules.add(rule.id);
+
+      if (eventBus) {
+        eventBus.publish('FindingCreated', { finding: infoFinding }).catch(() => {});
+        eventBus.publish('RuleCompleted', {
+          ruleId: rule.id,
+          passed: false,
+          findingsCount: 1
+        }).catch(() => {});
+      }
     }
   }
 
