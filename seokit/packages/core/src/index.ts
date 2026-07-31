@@ -53,6 +53,7 @@ import './rules/html.js';
 import './rules/ai-access.js';
 import './rules/schema.js';
 import './rules/aeo.js';
+import './rules/site-intelligence.js';
 
 // Platform Exports
 export * from './platform/store.js';
