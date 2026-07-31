@@ -1,5 +1,5 @@
-import { EffectivenessResult } from './types';
-import { TrackingMetrics } from '../tracking/types';
+import { EffectivenessResult } from './types.js';
+import { TrackingMetrics } from '../tracking/types.js';
 
 export class EffectivenessEvaluator {
   public evaluate(

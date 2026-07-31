@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { TrackingEngine, AlertEngine } from './engine';
-import { LocalSnapshotStore } from './store';
-import { AlertRule, TrackingProvider, SERPSnapshot, TrackingFetchOptions } from './types';
-import { VerificationEventBus } from '../events';
-import { ConfigurationProvider } from '../config/provider';
-import { TrackingAnalyzer } from './analyzer';
-import { TrackingProviderManager } from './provider-manager';
+import { TrackingEngine, AlertEngine } from './engine.js';
+import { LocalSnapshotStore } from './store.js';
+import { AlertRule, TrackingProvider, SERPSnapshot, TrackingFetchOptions } from './types.js';
+import { VerificationEventBus } from '../events.js';
+import { ConfigurationProvider } from '../config/provider.js';
+import { TrackingAnalyzer } from './analyzer.js';
+import { TrackingProviderManager } from './provider-manager.js';
 
 describe('AlertEngine', () => {
   let eventBus: VerificationEventBus;

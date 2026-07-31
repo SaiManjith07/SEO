@@ -1,7 +1,7 @@
-import { TrackingMetrics } from '../tracking/types';
-import { PageMetadata, DecayScore } from './types';
-import { VerificationEventBus } from '../events';
-import { ConfigurationProvider } from '../config/provider';
+import { TrackingMetrics } from '../tracking/types.js';
+import { PageMetadata, DecayScore } from './types.js';
+import { VerificationEventBus } from '../events.js';
+import { ConfigurationProvider } from '../config/provider.js';
 
 export class DecayDetector {
   private eventBus: VerificationEventBus;

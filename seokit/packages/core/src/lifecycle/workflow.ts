@@ -1,5 +1,5 @@
-import { LifecycleState } from './types';
-import { QueueItem } from './queue';
+import { LifecycleState } from './types.js';
+import { QueueItem } from './queue.js';
 
 export class WorkflowManager {
   

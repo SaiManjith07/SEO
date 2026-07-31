@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { LocalSnapshotStore } from './store';
-import { SERPSnapshot } from './types';
+import { LocalSnapshotStore } from './store.js';
+import { SERPSnapshot } from './types.js';
 
 describe('LocalSnapshotStore', () => {
   let store: LocalSnapshotStore;

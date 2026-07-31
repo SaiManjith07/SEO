@@ -1,7 +1,7 @@
-import { Opportunity, ScoredOpportunity, OutreachState } from './types';
-import { OpportunityScorer } from './scorer';
-import { OutreachGenerator } from './generator';
-import { VerificationEventBus } from '../events';
+import { Opportunity, ScoredOpportunity, OutreachState } from './types.js';
+import { OpportunityScorer } from './scorer.js';
+import { OutreachGenerator } from './generator.js';
+import { VerificationEventBus } from '../events.js';
 
 export class OutreachEngine {
   private scorer: OpportunityScorer;

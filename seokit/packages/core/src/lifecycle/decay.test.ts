@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { DecayDetector } from './decay';
-import { VerificationEventBus } from '../events';
-import { ConfigurationProvider } from '../config/provider';
-import { TrackingMetrics } from '../tracking/types';
-import { PageMetadata } from './types';
+import { DecayDetector } from './decay.js';
+import { VerificationEventBus } from '../events.js';
+import { ConfigurationProvider } from '../config/provider.js';
+import { TrackingMetrics } from '../tracking/types.js';
+import { PageMetadata } from './types.js';
 
 describe('DecayDetector (Scoring Model)', () => {
   let eventBus: VerificationEventBus;

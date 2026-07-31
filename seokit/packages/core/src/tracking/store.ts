@@ -1,4 +1,4 @@
-import { SnapshotStore, SERPSnapshot } from './types';
+import { SnapshotStore, SERPSnapshot } from './types.js';
 
 export class LocalSnapshotStore implements SnapshotStore {
   private snapshots: Map<string, SERPSnapshot> = new Map();
@@ -90,7 +90,7 @@ export class LocalSnapshotStore implements SnapshotStore {
     return results;
   }
 
-  async getStatistics(): Promise<import('./types').TrackingStoreStatistics> {
+  async getStatistics(): Promise<import('./types.js').TrackingStoreStatistics> {
     const uniqueKeywords = new Set<string>();
     let oldest: string | undefined = undefined;
     let newest: string | undefined = undefined;

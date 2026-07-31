@@ -1,5 +1,5 @@
-import { Opportunity } from './types';
-import { ConfigurationProvider } from '../config/provider';
+import { Opportunity } from './types.js';
+import { ConfigurationProvider } from '../config/provider.js';
 
 export class OpportunityScorer {
   private configProvider: ConfigurationProvider;

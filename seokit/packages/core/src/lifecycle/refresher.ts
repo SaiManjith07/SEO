@@ -1,6 +1,6 @@
-import { VerificationEventBus } from '../events';
-import { AIProvider } from '../platform/ai';
-import { RefreshResult } from './types';
+import { VerificationEventBus } from '../events.js';
+import { AIProvider } from '../platform/ai.js';
+import { RefreshResult } from './types.js';
 
 export class ContentRefresher {
   private aiProvider: AIProvider;

@@ -1,9 +1,9 @@
-import { DecayDetector } from './decay';
-import { ContentRefresher } from './refresher';
-import { PageMetadata } from './types';
-import { TrackingMetrics } from '../tracking/types';
-import { RefreshQueue, QueueItem } from './queue';
-import { WorkflowManager } from './workflow';
+import { DecayDetector } from './decay.js';
+import { ContentRefresher } from './refresher.js';
+import { PageMetadata } from './types.js';
+import { TrackingMetrics } from '../tracking/types.js';
+import { RefreshQueue, QueueItem } from './queue.js';
+import { WorkflowManager } from './workflow.js';
 
 export class LifecycleEngine {
   private decayDetector: DecayDetector;

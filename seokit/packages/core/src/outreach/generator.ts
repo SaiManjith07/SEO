@@ -1,6 +1,6 @@
-import { AIProvider } from '../platform/ai';
-import { Opportunity } from './types';
-import { ConfigurationProvider } from '../config/provider';
+import { AIProvider } from '../platform/ai.js';
+import { Opportunity } from './types.js';
+import { ConfigurationProvider } from '../config/provider.js';
 
 export class OutreachGenerator {
   private aiProvider: AIProvider;

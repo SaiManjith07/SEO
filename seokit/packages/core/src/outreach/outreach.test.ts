@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { OpportunityScorer } from './scorer';
-import { OutreachGenerator } from './generator';
-import { OutreachEngine } from './engine';
-import { ConfigurationProvider } from '../config/provider';
-import { VerificationEventBus } from '../events';
-import { Opportunity } from './types';
-import { AIProvider } from '../platform/ai';
+import { OpportunityScorer } from './scorer.js';
+import { OutreachGenerator } from './generator.js';
+import { OutreachEngine } from './engine.js';
+import { ConfigurationProvider } from '../config/provider.js';
+import { VerificationEventBus } from '../events.js';
+import { Opportunity } from './types.js';
+import { AIProvider } from '../platform/ai.js';
 
 describe('Outreach & Mention Growth Platform', () => {
   let configProvider: ConfigurationProvider;

@@ -5,6 +5,10 @@ export interface AIRecommendation {
   suggestion: string;
 }
 
+export interface AIProvider {
+  generate(prompt: string): Promise<string>;
+}
+
 export interface KeywordCluster {
   topic: string;
   keywords: string[];

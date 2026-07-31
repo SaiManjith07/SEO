@@ -1,8 +1,8 @@
-import { SnapshotStore, TrackingProvider, AlertRule, AlertEvent, SERPSnapshot, TrackingFetchOptions, TrackingMetrics } from './types';
-import { VerificationEventBus } from '../events';
-import { ConfigurationProvider } from '../config/provider';
-import { TrackingAnalyzer } from './analyzer';
-import { TrackingProviderManager } from './provider-manager';
+import { SnapshotStore, TrackingProvider, AlertRule, AlertEvent, SERPSnapshot, TrackingFetchOptions, TrackingMetrics } from './types.js';
+import { VerificationEventBus } from '../events.js';
+import { ConfigurationProvider } from '../config/provider.js';
+import { TrackingAnalyzer } from './analyzer.js';
+import { TrackingProviderManager } from './provider-manager.js';
 
 export class AlertEngine {
   private rules: AlertRule[] = [];

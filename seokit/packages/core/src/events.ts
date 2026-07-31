@@ -15,7 +15,7 @@ export interface VerificationEventMap {
   CacheMiss: { filePath: string; ruleId: string };
   PluginLoaded: { pluginId: string };
   PluginFailed: { pluginId: string; error: string };
-  TrackingAlertTriggered: { alert: import('./tracking/types').AlertEvent };
+  TrackingAlertTriggered: { alert: import('./tracking/types.js').AlertEvent };
   TrackingStarted: { keyword: string; date: string; providerName: string };
   TrackingCompleted: { keyword: string; date: string; providerName: string };
   TrackingFailed: { keyword: string; date: string; providerName: string; error: string };

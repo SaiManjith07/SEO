@@ -1,5 +1,5 @@
-import { TrackingProvider, SERPSnapshot, TrackingFetchOptions } from './types';
-import { VerificationEventBus } from '../events';
+import { TrackingProvider, SERPSnapshot, TrackingFetchOptions } from './types.js';
+import { VerificationEventBus } from '../events.js';
 
 export class TrackingProviderManager implements TrackingProvider {
   public name = 'ProviderManager';

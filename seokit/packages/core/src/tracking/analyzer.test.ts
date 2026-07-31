@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { TrackingAnalyzer } from './analyzer';
-import { SERPSnapshot } from './types';
+import { TrackingAnalyzer } from './analyzer.js';
+import { SERPSnapshot } from './types.js';
 
 describe('TrackingAnalyzer', () => {
   const analyzer = new TrackingAnalyzer();

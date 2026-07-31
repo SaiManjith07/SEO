@@ -1,5 +1,5 @@
-import { PageMetadata, DecayScore, LifecycleState } from './types';
-import { TrackingMetrics } from '../tracking/types';
+import { PageMetadata, DecayScore, LifecycleState } from './types.js';
+import { TrackingMetrics } from '../tracking/types.js';
 
 export interface QueueItem {
   id: string;

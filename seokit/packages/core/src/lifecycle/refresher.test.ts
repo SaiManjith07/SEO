@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ContentRefresher } from './refresher';
-import { VerificationEventBus } from '../events';
-import { AIProvider } from '../platform/ai';
+import { ContentRefresher } from './refresher.js';
+import { VerificationEventBus } from '../events.js';
+import { AIProvider } from '../platform/ai.js';
 
 describe('ContentRefresher', () => {
   let eventBus: VerificationEventBus;

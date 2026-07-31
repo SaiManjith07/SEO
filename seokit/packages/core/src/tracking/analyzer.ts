@@ -1,4 +1,4 @@
-import { SERPSnapshot, TrackingMetrics } from './types';
+import { SERPSnapshot, TrackingMetrics } from './types.js';
 
 export class TrackingAnalyzer {
   
