@@ -38,6 +38,30 @@ export async function main() {
     const targetFolder = target;
     console.log(`[SEOKit] Target workspace: ${targetFolder}`);
 
+    // Determine best MCP execution path (prefer local node absolute path)
+    let mcpCommand = 'npx';
+    let mcpArgs = ['-y', 'seokit', 'mcp'];
+    
+    // In ESM, __dirname is not defined, we use import.meta.url
+    const { fileURLToPath } = await import('url');
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    
+    // In compiled CLI (packages/cli/dist/index.js), the mcp package is at ../../mcp/dist/index.js
+    let potentialMcpPath = path.resolve(__dirname, '../../mcp/dist/index.js');
+    if (!fs.existsSync(potentialMcpPath)) {
+        // Fallback for ts-node / src execution
+        potentialMcpPath = path.resolve(__dirname, '../node_modules/@seokit/mcp/dist/index.js');
+    }
+    
+    if (fs.existsSync(potentialMcpPath)) {
+        mcpCommand = process.execPath; // current node executable
+        mcpArgs = [potentialMcpPath];
+        console.log(`[SEOKit] Found local MCP module. Preferring direct execution: ${potentialMcpPath}`);
+    } else {
+        console.log(`[SEOKit] Using global npx fallback for MCP execution.`);
+    }
+
     // Cursor Integration Setup
     const cursorDir = path.join(targetFolder, '.cursor');
     try {
@@ -53,8 +77,8 @@ export async function main() {
       }
       if (!cursorConfig.mcpServers) cursorConfig.mcpServers = {};
       cursorConfig.mcpServers.seokit = {
-        command: 'npx',
-        args: ['-y', 'seokit', 'mcp'],
+        command: mcpCommand,
+        args: mcpArgs,
         env: {}
       };
       fs.writeFileSync(cursorMcpPath, JSON.stringify(cursorConfig, null, 2), 'utf-8');
@@ -78,8 +102,8 @@ export async function main() {
       }
       if (!agentsConfig.mcpServers) agentsConfig.mcpServers = {};
       agentsConfig.mcpServers.seokit = {
-        command: 'npx',
-        args: ['-y', 'seokit', 'mcp']
+        command: mcpCommand,
+        args: mcpArgs
       };
       fs.writeFileSync(agentsMcpPath, JSON.stringify(agentsConfig, null, 2), 'utf-8');
       console.log(`✓ Antigravity config registered at: ${agentsMcpPath}`);
@@ -112,8 +136,8 @@ export async function main() {
         }
         if (!claudeConfig.mcpServers) claudeConfig.mcpServers = {};
         claudeConfig.mcpServers.seokit = {
-          command: 'npx',
-          args: ['-y', 'seokit', 'mcp']
+          command: mcpCommand,
+          args: mcpArgs
         };
         fs.writeFileSync(claudeMcpPath, JSON.stringify(claudeConfig, null, 2), 'utf-8');
         console.log(`✓ Claude Desktop config registered at: ${claudeMcpPath}`);

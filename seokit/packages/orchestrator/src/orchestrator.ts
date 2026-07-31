@@ -19,6 +19,7 @@ export function buildLegacyContext(page: Page, website: Website): any {
     filePath: page.route,
     robotsTxt: website.robotsTxt,
     sitemapXml: website.sitemapXml,
+    headers: page.headers || {},
     config: {
       aiCrawlers: [
         'Googlebot',

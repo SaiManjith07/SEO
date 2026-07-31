@@ -610,11 +610,43 @@ server.registerPrompt(
   }
 );
 
+import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import express from 'express';
+
 // Stdio initialization wrapper
 async function run() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error('SEOKit v2 MCP Server running on stdio');
+  const args = process.argv.slice(2);
+  const isSSE = args.includes('--sse');
+  
+  if (isSSE) {
+    const app = express();
+    let sseTransport: SSEServerTransport | null = null;
+    
+    app.get('/sse', async (req, res) => {
+      sseTransport = new SSEServerTransport('/messages', res);
+      await server.connect(sseTransport);
+      console.log('Client connected to SSE transport.');
+    });
+
+    app.post('/messages', async (req, res) => {
+      if (!sseTransport) {
+        res.sendStatus(400);
+        return;
+      }
+      await sseTransport.handlePostMessage(req, res);
+    });
+
+    const portIndex = args.indexOf('--port');
+    const port = portIndex !== -1 ? parseInt(args[portIndex + 1], 10) : 3000;
+    
+    app.listen(port, '127.0.0.1', () => {
+      console.log(`[SEOKit] MCP Server running on SSE at http://127.0.0.1:${port}/sse`);
+    });
+  } else {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error('SEOKit v2 MCP Server running on stdio');
+  }
 }
 
 if (process.env.NODE_ENV !== 'test') {

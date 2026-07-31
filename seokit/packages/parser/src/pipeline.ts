@@ -2,6 +2,8 @@ import * as cheerio from 'cheerio';
 import { Website, Page, PageMetadata, MetadataField, SourceLocation } from '@seokit/website';
 import { WebsiteBuilder } from '@seokit/website';
 import { IParserPipeline, RawResource, ParserOptions } from './interfaces.js';
+import * as ts from 'typescript';
+import { NextJsExtractor, RemixExtractor } from './ast/index.js';
 
 export class ParserPipeline implements IParserPipeline {
   public async parse(resources: RawResource[], options: ParserOptions = {}): Promise<Website> {
@@ -14,6 +16,30 @@ export class ParserPipeline implements IParserPipeline {
       } else if (res.route.endsWith('sitemap.xml')) {
         builder.setSitemapXml(res.content.toString());
       } else if (res.route.endsWith('.html') || res.route === '/' || res.route.endsWith('/')) {
+        let astMetadata: Partial<PageMetadata> | null = null;
+        const srcPath = res.sourcePath || res.route;
+        const isAstFile = srcPath.match(/\.(ts|tsx|js|jsx)$/);
+
+        if (isAstFile) {
+          const code = res.content.toString();
+          const sourceFile = ts.createSourceFile(srcPath, code, ts.ScriptTarget.Latest, true);
+          
+          // Try NextJs
+          const nextExtractor = new NextJsExtractor();
+          const nextMeta = nextExtractor.extract(sourceFile, code);
+          
+          // Try Remix
+          const remixExtractor = new RemixExtractor();
+          const remixMeta = remixExtractor.extract(sourceFile, code);
+
+          // Merge AST metadata (whichever found properties wins)
+          astMetadata = { ...nextMeta, ...remixMeta };
+          // Deep merge metaTags
+          if (nextMeta.metaTags || remixMeta.metaTags) {
+            astMetadata.metaTags = { ...(nextMeta.metaTags || {}), ...(remixMeta.metaTags || {}) };
+          }
+        }
+
         const html = res.content.toString();
         const $ = cheerio.load(html);
 
@@ -41,8 +67,11 @@ export class ParserPipeline implements IParserPipeline {
           return undefined;
         };
 
+        // Check if AST parsed metadata has value, otherwise fallback to cheerio
         const titleText = $('title').text().trim();
-        if (titleText) {
+        if (astMetadata?.title) {
+           pageMetadata.title = astMetadata.title;
+        } else if (titleText) {
           pageMetadata.title = {
             value: titleText,
             location: locate(`<title>`) || locate(titleText)
@@ -50,7 +79,9 @@ export class ParserPipeline implements IParserPipeline {
         }
 
         const descText = $('meta[name="description"]').attr('content')?.trim();
-        if (descText) {
+        if (astMetadata?.description) {
+           pageMetadata.description = astMetadata.description;
+        } else if (descText) {
           pageMetadata.description = {
             value: descText,
             location: locate('name="description"') || locate(descText)
@@ -58,7 +89,9 @@ export class ParserPipeline implements IParserPipeline {
         }
 
         const canonicalText = $('link[rel="canonical"]').attr('href')?.trim();
-        if (canonicalText) {
+        if (astMetadata?.canonicalUrl) {
+           pageMetadata.canonicalUrl = astMetadata.canonicalUrl;
+        } else if (canonicalText) {
           pageMetadata.canonicalUrl = {
             value: canonicalText,
             location: locate('rel="canonical"') || locate(canonicalText)
@@ -110,16 +143,20 @@ export class ParserPipeline implements IParserPipeline {
         });
 
         // Meta tags
-        $('meta').each((_, el) => {
-          const name = $(el).attr('name') || $(el).attr('property');
-          const content = $(el).attr('content');
-          if (name && content) {
-            pageMetadata.metaTags[name] = {
-              value: content,
-              location: locate(name)
-            };
-          }
-        });
+        if (astMetadata?.metaTags && Object.keys(astMetadata.metaTags).length > 0) {
+           pageMetadata.metaTags = astMetadata.metaTags;
+        } else {
+            $('meta').each((_, el) => {
+            const name = $(el).attr('name') || $(el).attr('property');
+            const content = $(el).attr('content');
+            if (name && content) {
+                pageMetadata.metaTags[name] = {
+                value: content,
+                location: locate(name)
+                };
+            }
+            });
+        }
 
         // Structured Data JSON-LD
         const structuredData: any[] = [];

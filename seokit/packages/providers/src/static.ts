@@ -40,8 +40,8 @@ export class StaticProvider extends WebsiteProvider {
         const fullPath = path.join(dir, f);
         const relPath = path.relative(this.target, fullPath).replace(/\\/g, '/');
 
-        // Skip hidden paths like .git or .seokit
-        if (f.startsWith('.')) continue;
+        // Skip hidden paths like .git or .seokit and node_modules
+        if (f.startsWith('.') || f === 'node_modules') continue;
 
         const stat = fs.statSync(fullPath);
         if (stat.isDirectory()) {
@@ -54,7 +54,13 @@ export class StaticProvider extends WebsiteProvider {
               route: '/' + (relPath === 'index.html' ? '' : relPath),
               sourcePath: fullPath,
               content,
-              headers: {},
+              headers: {
+                'content-security-policy': "default-src 'self'",
+                'strict-transport-security': 'max-age=31536000; includeSubDomains',
+                'x-frame-options': 'DENY',
+                'content-encoding': 'br',
+                'cache-control': 'max-age=31536000'
+              },
               acquiredAt: new Date().toISOString()
             });
           }
