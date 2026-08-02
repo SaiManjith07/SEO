@@ -115,6 +115,7 @@ export class LocalExecutionProvider implements ExecutionProvider {
             ruleId: rule.id,
             severity: 'info',
             message: `Rule "${rule.id}" threw: ${err.message}`,
+            fix: 'Review the rule implementation code and fix the runtime exception.',
           };
           findings.push(infoFinding);
           failedRules.add(rule.id);
@@ -255,6 +256,7 @@ export class ThreadPoolExecutionProvider implements ExecutionProvider {
             ruleId: rule.id,
             severity: 'info',
             message: `Rule "${rule.id}" threw: ${err.message}`,
+            fix: 'Review the rule implementation code and fix the runtime exception.',
           };
           findings.push(infoFinding);
           failedRules.add(rule.id);

@@ -180,6 +180,7 @@ export function runRules(ctx: Context, config?: SeoKitConfig, eventBus?: Verific
         message: `Rule "${rule.id}" threw: ${
           err instanceof Error ? err.message : String(err)
         }`,
+        fix: 'Review the rule implementation code and fix the runtime exception.',
       };
       findings.push(infoFinding);
       failedRules.add(rule.id);

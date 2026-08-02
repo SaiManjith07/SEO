@@ -99,4 +99,14 @@ describe('SEOKit Phase 8 — Automated SEO Fix Engine Tests', () => {
 
     fs.rmSync(tempRoot, { recursive: true, force: true });
   });
+
+  it('should generate formatted llms.txt contents correctly', () => {
+    const pages = [
+      { title: 'Doc 1', url: 'https://test.com/doc1', description: 'Primary reference' }
+    ];
+    const res = SEOFixerEngine.generateLlmsTxt('My Project', 'A cool test project.', pages);
+    expect(res).toContain('# My Project');
+    expect(res).toContain('> A cool test project.');
+    expect(res).toContain('- [Doc 1](https://test.com/doc1): Primary reference');
+  });
 });

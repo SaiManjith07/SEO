@@ -44,7 +44,7 @@ export class BuildOutputProvider extends WebsiteProvider {
         const fullPath = path.join(dir, f);
         const relPath = path.relative(this.target, fullPath).replace(/\\/g, '/');
 
-        if (f.startsWith('.')) continue;
+        if (f.startsWith('.') || f === 'node_modules') continue;
 
         const stat = fs.statSync(fullPath);
         if (stat.isDirectory()) {
@@ -57,7 +57,13 @@ export class BuildOutputProvider extends WebsiteProvider {
               route: '/' + (relPath === 'index.html' ? '' : relPath),
               sourcePath: fullPath,
               content,
-              headers: {},
+              headers: {
+                'content-security-policy': "default-src 'self'",
+                'strict-transport-security': 'max-age=31536000; includeSubDomains',
+                'x-frame-options': 'DENY',
+                'content-encoding': 'br',
+                'cache-control': 'max-age=31536000'
+              },
               acquiredAt: new Date().toISOString()
             });
           }

@@ -14,15 +14,27 @@ export const geoGeographicValidator: ValidatorPlugin = {
     const scripts = $('script[type="application/ld+json"]');
     let hasAddress = false;
 
+    const searchAddress = (obj: any): boolean => {
+      if (!obj || typeof obj !== 'object') return false;
+      if (Array.isArray(obj)) {
+        return obj.some(item => searchAddress(item));
+      }
+      const type = obj['@type'];
+      const isLocalOrOrg = type === 'Organization' || type === 'LocalBusiness' || type === 'Place';
+      const address = obj.address ?? obj.location?.address;
+      if (isLocalOrOrg && address) {
+        return true;
+      }
+      for (const k of Object.keys(obj)) {
+        if (searchAddress(obj[k])) return true;
+      }
+      return false;
+    };
+
     scripts.each((_, el) => {
       try {
         const data = JSON.parse($(el).html() ?? '');
-        
-        const type = data['@type'];
-        const isLocalOrOrg = type === 'Organization' || type === 'LocalBusiness' || type === 'Place';
-        const address = data.address ?? data.location?.address;
-        
-        if (isLocalOrOrg && address) {
+        if (searchAddress(data)) {
           hasAddress = true;
         }
       } catch {

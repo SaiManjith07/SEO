@@ -14,10 +14,24 @@ export const geoProvenanceValidator: ValidatorPlugin = {
     const scripts = $('script[type="application/ld+json"]');
     let hasDates = false;
 
+    const searchDates = (obj: any): boolean => {
+      if (!obj || typeof obj !== 'object') return false;
+      if (Array.isArray(obj)) {
+        return obj.some(item => searchDates(item));
+      }
+      if (obj.datePublished || obj.dateModified) {
+        return true;
+      }
+      for (const k of Object.keys(obj)) {
+        if (searchDates(obj[k])) return true;
+      }
+      return false;
+    };
+
     scripts.each((_, el) => {
       try {
         const data = JSON.parse($(el).html() ?? '');
-        if (data.datePublished || data.dateModified) {
+        if (searchDates(data)) {
           hasDates = true;
         }
       } catch {

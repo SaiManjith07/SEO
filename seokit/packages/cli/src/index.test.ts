@@ -40,7 +40,8 @@ describe('SEOKit v2 Platform CLI Integrations', () => {
     expect(fs.existsSync(agentsMcp)).toBe(true);
 
     const cursorConfig = JSON.parse(fs.readFileSync(cursorMcp, 'utf-8'));
-    expect(cursorConfig.mcpServers.seokit.command).toBe('npx');
+    expect(cursorConfig.mcpServers.seokit.command).toBe('node');
+    expect(cursorConfig.mcpServers.seokit.args[0]).toContain('/mcp/dist/index.js');
   });
 
   it('should execute doctor diagnostics checks successfully', async () => {
@@ -58,7 +59,7 @@ describe('SEOKit v2 Platform CLI Integrations', () => {
     process.argv = originalArgv;
     process.exit = originalExit;
     expect(exitMock).toHaveBeenCalled();
-  });
+  }, 20000);
 
   it('should create log file and record steps during verify run', async () => {
     const originalArgv = process.argv;

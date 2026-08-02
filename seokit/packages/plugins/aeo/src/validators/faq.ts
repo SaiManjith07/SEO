@@ -14,11 +14,26 @@ export const aeoFaqValidator: ValidatorPlugin = {
     const scripts = $('script[type="application/ld+json"]');
     
     let hasFAQ = false;
+    const searchFAQ = (obj: any): boolean => {
+      if (!obj || typeof obj !== 'object') return false;
+      if (Array.isArray(obj)) {
+        return obj.some(item => searchFAQ(item));
+      }
+      const type = obj['@type'];
+      const matchesType = type === 'FAQPage' || (Array.isArray(type) && type.includes('FAQPage'));
+      if (matchesType) {
+        return true;
+      }
+      for (const k of Object.keys(obj)) {
+        if (searchFAQ(obj[k])) return true;
+      }
+      return false;
+    };
+
     scripts.each((_, el) => {
       try {
         const data = JSON.parse($(el).html() ?? '');
-        const type = data['@type'];
-        if (type === 'FAQPage' || (Array.isArray(type) && type.includes('FAQPage'))) {
+        if (searchFAQ(data)) {
           hasFAQ = true;
         }
       } catch {

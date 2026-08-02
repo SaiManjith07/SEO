@@ -1,5 +1,6 @@
 import { WorkspaceManager } from '@seokit/workspace';
 import * as fs from 'fs';
+import * as path from 'path';
 import { EventBus } from '@seokit/events';
 import { ParserPipeline } from '@seokit/parser';
 import { OAuthManager, GoogleIntelligenceConnector, BingWebmasterConnector } from '@seokit/providers';
@@ -363,11 +364,15 @@ export class VerificationOrchestrator {
       throw new Error(`Session not found: ${sessionId}`);
     }
 
+    const isNewFileFix = ['sitemap', 'robots', 'llms-txt'].includes(fixType);
+
     if (!fs.existsSync(filePath)) {
-      throw new Error(`Target file to fix does not exist: ${filePath}`);
+      if (!isNewFileFix) {
+        throw new Error(`Target file to fix does not exist: ${filePath}`);
+      }
     }
 
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const content = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf-8') : '';
     SEOFixerEngine.validateFixSafety(content, fixType, options);
     let modified = content;
 
@@ -388,7 +393,78 @@ export class VerificationOrchestrator {
     } else if (fixType === 'internal-link') {
       modified = SEOFixerEngine.insertInternalLink(content, options.anchor || 'Read more', options.href || '#');
     } else if (fixType === 'robots') {
-      modified = SEOFixerEngine.fixRobotsTxt(content);
+      const sitemapUrl = options.sitemapUrl || ((session.loadedConfig as any)?.siteUrl ? `${(session.loadedConfig as any).siteUrl.replace(/\/$/, '')}/sitemap.xml` : 'https://nabhilabs.com/sitemap.xml');
+      modified = SEOFixerEngine.fixRobotsTxt(content, sitemapUrl);
+    } else if (fixType === 'sitemap') {
+      let urls: string[] = [];
+      try {
+        const workspaceRoot = session.workspaceSession.workspacePath;
+        const walkSync = (dir: string) => {
+          const files = fs.readdirSync(dir);
+          for (const f of files) {
+            const fullPath = path.join(dir, f);
+            if (f.startsWith('.') || f === 'node_modules' || f === '.seokit') continue;
+            const stat = fs.statSync(fullPath);
+            if (stat.isDirectory()) {
+              walkSync(fullPath);
+            } else {
+              const ext = path.extname(f).toLowerCase();
+              if (ext === '.html') {
+                const relPath = path.relative(workspaceRoot, fullPath).replace(/\\/g, '/');
+                const route = relPath === 'index.html' ? '' : relPath;
+                const baseUrl = (session.loadedConfig as any)?.siteUrl || options.baseUrl || 'https://nabhilabs.com';
+                urls.push(`${baseUrl.replace(/\/$/, '')}/${route}`);
+              }
+            }
+          }
+        };
+        walkSync(workspaceRoot);
+      } catch {
+        // ignore
+      }
+      if (urls.length === 0) {
+        const baseUrl = (session.loadedConfig as any)?.siteUrl || options.baseUrl || 'https://nabhilabs.com';
+        urls = [baseUrl];
+      }
+      modified = SEOFixerEngine.generateSitemap(options.urls || urls);
+    } else if (fixType === 'llms-txt') {
+      let pagesList: { title: string; url: string; description?: string }[] = [];
+      try {
+        const workspaceRoot = session.workspaceSession.workspacePath;
+        const walkSync = (dir: string) => {
+          const files = fs.readdirSync(dir);
+          for (const f of files) {
+            const fullPath = path.join(dir, f);
+            if (f.startsWith('.') || f === 'node_modules' || f === '.seokit') continue;
+            const stat = fs.statSync(fullPath);
+            if (stat.isDirectory()) {
+              walkSync(fullPath);
+            } else {
+              const ext = path.extname(f).toLowerCase();
+              if (ext === '.html') {
+                const relPath = path.relative(workspaceRoot, fullPath).replace(/\\/g, '/');
+                const route = relPath === 'index.html' ? '' : relPath;
+                const baseUrl = (session.loadedConfig as any)?.siteUrl || options.baseUrl || 'https://nabhilabs.com';
+                const url = `${baseUrl.replace(/\/$/, '')}/${route}`;
+                const htmlContent = fs.readFileSync(fullPath, 'utf-8');
+                const titleMatch = htmlContent.match(/<title>([^]*?)<\/title>/i);
+                const title = titleMatch ? titleMatch[1].trim() : path.basename(f);
+                pagesList.push({ title, url });
+              }
+            }
+          }
+        };
+        walkSync(workspaceRoot);
+      } catch {
+        // ignore
+      }
+      if (pagesList.length === 0) {
+        const baseUrl = (session.loadedConfig as any)?.siteUrl || options.baseUrl || 'https://nabhilabs.com';
+        pagesList = [{ title: 'Home', url: baseUrl }];
+      }
+      const siteName = (session.loadedConfig as any)?.siteName || options.siteName || 'SEOKit Site';
+      const description = (session.loadedConfig as any)?.siteDescription || options.description || 'Developer documentation and product index.';
+      modified = SEOFixerEngine.generateLlmsTxt(siteName, description, options.pages || pagesList);
     }
 
     const diffText = SEOFixerEngine.generateDiff(content, modified);

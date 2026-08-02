@@ -9,7 +9,7 @@ export const aeoChunkingValidator: ValidatorPlugin = {
       return { passed: true, confidence: 1.0, output: 'No HTML available.', source: 'aeo-chunking-validator' };
     }
 
-    const chunks = extractChunks(html);
+    const chunks = extractChunks(html).filter(c => c.content.split(/\s+/).filter(Boolean).length >= 20);
     let lowScoreChunksCount = 0;
 
     for (const chunk of chunks) {

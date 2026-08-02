@@ -49,8 +49,9 @@ export class MCPResourceStreamer {
   }
 }
 
-export function validateMcpAuth(authToken?: string, expectedToken: string = 'seokit_secret'): boolean {
-  if (!authToken || authToken !== expectedToken) {
+export function validateMcpAuth(authToken?: string, expectedToken?: string): boolean {
+  const targetToken = expectedToken || process.env.SEOKIT_SECRET || 'seokit_secret';
+  if (!authToken || authToken !== targetToken) {
     throw new Error('Unauthorized remote MCP connection: Invalid token.');
   }
   return true;

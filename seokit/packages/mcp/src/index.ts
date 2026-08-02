@@ -259,7 +259,74 @@ server.registerResource(
   }
 );
 
-// I. Audit Website Prompt
+// D. seokit://guidelines
+server.registerResource(
+  'seokit-guidelines',
+  'seokit://guidelines',
+  {
+    title: 'SEOKit Governing Guidelines',
+    description: 'Guidelines and active rule catalogue applied by the agent.',
+    mimeType: 'text/markdown'
+  },
+  async (uri) => {
+    const plugins = PluginRegistry.getAll();
+    const rulesList: string[] = [];
+
+    for (const plugin of plugins) {
+      if (plugin.rules) {
+        for (const rule of plugin.rules) {
+          rulesList.push(`- **${rule.id}** (${rule.standard || 'General'}): ${rule.description}`);
+        }
+      }
+    }
+
+    const rulesMarkdown = [
+      '# Active Verification Rules Catalog',
+      '',
+      ...rulesList
+    ].join('\n');
+
+    return {
+      contents: [
+        {
+          uri: uri.href,
+          mimeType: 'text/markdown',
+          text: rulesMarkdown
+        }
+      ]
+    };
+  }
+);
+
+// E. seokit://standards/{id}
+server.registerResource(
+  'seokit-standards-detail',
+  'seokit://standards/{id}',
+  {
+    title: 'SEOKit Governing Standard Detail',
+    description: 'Specific standard information.',
+    mimeType: 'text/markdown'
+  },
+  async (uri) => {
+    // Robust pathname extraction for any ID parameter
+    const match = uri.pathname.match(/^\/standards\/(.+)$/) || uri.href.match(/standards\/(.+)$/);
+    const id = match ? match[1] : 'General';
+    const detail = `# SEOKit Standard Detail: ${id}
+    
+This is a standard governing guideline. Follow it to ensure high indexability and visibility in AI search.`;
+
+    return {
+      contents: [
+        {
+          uri: uri.href,
+          mimeType: 'text/markdown',
+          text: detail
+        }
+      ]
+    };
+  }
+);
+
 server.registerPrompt(
   'audit_website',
   {
@@ -532,7 +599,7 @@ server.registerTool(
     inputSchema: {
       workspacePath: z.string().describe('Absolute folder path of the workspace.'),
       filePath: z.string().describe('Absolute path to the target file to modify.'),
-      fixType: z.string().describe('Type of fix: canonical, breadcrumbs, schema, title, description, alt, headings, internal-link, robots.'),
+      fixType: z.string().describe('Type of fix: canonical, breadcrumbs, schema, title, description, alt, headings, internal-link, robots, sitemap, llms-txt.'),
       options: z.any().optional().describe('Extra options such as href, title, description, anchor, or schema json string.')
     }
   },

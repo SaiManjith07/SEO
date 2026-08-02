@@ -17,7 +17,7 @@ describe('coder-mcp memory and files tools tests', () => {
   });
 
   afterAll(() => {
-    // Release SQLite file handle first
+    // Reset in-memory path cache
     closeDb();
 
     // Cleanup temporary files
@@ -31,10 +31,10 @@ describe('coder-mcp memory and files tools tests', () => {
       fs.rmdirSync(testDir);
     }
 
-    // Cleanup memory db
-    const dbFile = path.join(process.cwd(), '.seokit', 'coder-memory.db');
-    if (fs.existsSync(dbFile)) {
-      fs.unlinkSync(dbFile);
+    // Cleanup memory JSON store
+    const memoryFile = path.join(process.cwd(), '.seokit', 'coder-memory.json');
+    if (fs.existsSync(memoryFile)) {
+      fs.unlinkSync(memoryFile);
     }
     const dbDir = path.join(process.cwd(), '.seokit');
     if (fs.existsSync(dbDir)) {

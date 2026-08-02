@@ -21,6 +21,12 @@ export const renderblockingValidator: ValidatorPlugin = {
 
     headScripts.each((_, el) => {
       const src = $(el).attr('src') ?? '';
+      
+      // Skip Next.js framework scripts as they are handled by the framework router/loader
+      if (src.includes('_next/') || src.includes('next/static')) {
+        return;
+      }
+
       const isAsync = $(el).attr('async') !== undefined;
       const isDefer = $(el).attr('defer') !== undefined;
       const isModule = $(el).attr('type') === 'module';

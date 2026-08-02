@@ -57,41 +57,60 @@ seokit://standards/{id}    a single STD-## entry: threshold, source, fix
 
 ### Tier 2 — Project knowledge (per repo, mostly static)
 
-Human decisions the agent must respect and never re-litigate, plus the project's actual conventions (framework, routing, metadata approach). Stored locally (SQLite, `.seokit/memory.db`, gitignored):
+Human decisions the agent must respect and never re-litigate, plus the project's actual conventions (framework, routing, metadata approach). Stored locally in JSON format (`.seokit/project.json` and `.seokit/decisions.json`, gitignored):
 
-```sql
-CREATE TABLE project (
-  id INTEGER PRIMARY KEY, root TEXT UNIQUE, site_url TEXT,
-  framework TEXT, conventions TEXT, updated_at TEXT
-);
+```typescript
+export interface ProjectRecord {
+  id: number;
+  root: string;
+  siteUrl?: string;
+  framework?: string;
+  conventions?: string;
+  updatedAt: string;
+}
 
-CREATE TABLE decisions (
-  id INTEGER PRIMARY KEY, project_id INTEGER REFERENCES project(id),
-  rule_id TEXT, decision TEXT NOT NULL, rationale TEXT NOT NULL, created_at TEXT
-);
+export interface DecisionRecord {
+  id: number;
+  projectId: number;
+  ruleId: string;
+  decision: string;
+  rationale: string;
+  createdAt: string;
+}
 ```
 
-`decisions` is the highest-value table here: "we do not add FAQ schema to product pages — legal requires reviewed copy" recorded once means no future agent session re-suggests the thing that was already rejected.
+`decisions` is the highest-value database here: "we do not add FAQ schema to product pages — legal requires reviewed copy" recorded once means no future agent session re-suggests the thing that was already rejected.
 
 ### Tier 3 — Outcomes (the tier that makes the system learn)
 
-Every fix the critic predicted a reward gain for, and what actually happened when it shipped:
+Every fix the critic predicted a reward gain for, and what actually happened when it shipped. Stored locally in JSON format (`.seokit/fix_outcomes.json` and `.seokit/grades.json`, gitignored):
 
-```sql
-CREATE TABLE fix_outcomes (
-  id INTEGER PRIMARY KEY, project_id INTEGER REFERENCES project(id),
-  url TEXT, rule_id TEXT NOT NULL, fix_summary TEXT NOT NULL,
-  reward_before REAL, reward_after REAL, predicted_gain REAL,
-  worked INTEGER NOT NULL, created_at TEXT
-);
+```typescript
+export interface FixOutcomeRecord {
+  id: number;
+  projectId: number;
+  url: string;
+  ruleId: string;
+  fixSummary: string;
+  rewardBefore: number;
+  rewardAfter: number;
+  predictedGain: number;
+  worked: number;
+  createdAt: string;
+}
 
-CREATE TABLE grades (
-  id INTEGER PRIMARY KEY, project_id INTEGER REFERENCES project(id),
-  url TEXT, reward REAL, grade TEXT, confidence REAL, report TEXT, created_at TEXT
-);
+export interface CrawlRecord {
+  id: number;
+  projectId: number;
+  score: number;
+  pagesCrawled: number;
+  errorsCount: number;
+  warningsCount: number;
+  createdAt: string;
+}
 ```
 
-Storing `predicted_gain` next to `reward_after` gives a **calibration record**: if a standard's predicted gain consistently overshoots actual, that standard's weight or gate is wrong and can be corrected with evidence — the tool audits its own accuracy against real outcomes, not industry benchmarks.
+Storing `predictedGain` next to `rewardAfter` gives a **calibration record**: if a standard's predicted gain consistently overshoots actual, that standard's weight or gate is wrong and can be corrected with evidence — the tool audits its own accuracy against real outcomes, not industry benchmarks.
 
 **Why memory attaches to the evaluator, not the critic:** the critic must stay stateless and independent. It grades what is in front of it, with no memory of what it graded before. The host IDE agent holds both connections and closes the loop itself: evaluator makes a change → critic grades it (stateless) → the agent records the outcome via the evaluator's memory tools → next time, memory informs the fix. The critic never learns; the system does.
 
@@ -320,7 +339,7 @@ The moat is the build-time, standards-grounded, dual-server layer — not a gene
 | 1 — evaluator MCP | Built | 7 tools, guidelines resource |
 | 1.5 — critic MCP | Built | 23 benchmarks, reward function, 5 tools |
 | 2 — crawler + CLI + GSC adapter | Next | Site-wide rules, `seo_find_opportunities`, `npx seokit` |
-| 3 — scaffolding + memory | | Framework detection, `seo_init`, Tier 2/3 memory (SQLite), GitHub Action |
+| 3 — scaffolding + memory | | Framework detection, `seo_init`, Tier 2/3 memory (JSON), GitHub Action |
 | 4 — AEO depth | | Chunk-level scoring, entity coverage |
 | 5 — dashboard | | Scheduled crawls, history, regression diffs |
 

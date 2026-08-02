@@ -15,10 +15,24 @@ export const geoAuthorValidator: ValidatorPlugin = {
     
     let hasAuthorSchema = false;
     const scripts = $('script[type="application/ld+json"]');
+    const searchAuthor = (obj: any): boolean => {
+      if (!obj || typeof obj !== 'object') return false;
+      if (Array.isArray(obj)) {
+        return obj.some(item => searchAuthor(item));
+      }
+      if (obj.author || obj.creator) {
+        return true;
+      }
+      for (const k of Object.keys(obj)) {
+        if (searchAuthor(obj[k])) return true;
+      }
+      return false;
+    };
+
     scripts.each((_, el) => {
       try {
         const data = JSON.parse($(el).html() ?? '');
-        if (data.author || data.creator) {
+        if (searchAuthor(data)) {
           hasAuthorSchema = true;
         }
       } catch {

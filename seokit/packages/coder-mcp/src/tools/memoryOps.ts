@@ -1,43 +1,13 @@
-import Database from 'better-sqlite3';
 import * as fs from 'fs';
 import * as path from 'path';
 
-let dbInstance: Database.Database | null = null;
-
-export function closeDb(): void {
-  if (dbInstance) {
-    dbInstance.close();
-    dbInstance = null;
-  }
-}
-
-function getDb(): Database.Database {
-  if (dbInstance) return dbInstance;
-
-  const dbDir = path.join(process.cwd(), '.seokit');
-  if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
-  }
-
-  const dbPath = path.join(dbDir, 'coder-memory.db');
-  const db = new Database(dbPath);
-
-  // Initialize schema
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS project_memory (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      project_id TEXT NOT NULL,
-      key TEXT NOT NULL,
-      value TEXT NOT NULL,
-      metadata TEXT,
-      updated_at TEXT NOT NULL,
-      UNIQUE(project_id, key)
-    );
-  `);
-
-  dbInstance = db;
-  return db;
-}
+/**
+ * Project memory storage — plain JSON file, no native/SQL database.
+ * Mirrors the pattern already used by @seokit/core's memory/db.ts: one
+ * JSON array on disk under `.seokit/`, read-modify-write per call. No
+ * native module, no compiled binary, nothing that can fail to install
+ * in a sandboxed or offline environment.
+ */
 
 export interface MemoryEntry {
   id: number;
@@ -48,38 +18,82 @@ export interface MemoryEntry {
   updated_at: string;
 }
 
-export function saveMemory(projectId: string, key: string, value: string, metadata?: string): string {
-  const db = getDb();
+let cachedPath: string | null = null;
+
+function getMemoryFilePath(): string {
+  if (cachedPath) return cachedPath;
+  const dbDir = path.join(process.cwd(), '.seokit');
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+  cachedPath = path.join(dbDir, 'coder-memory.json');
+  return cachedPath;
+}
+
+function readEntries(): MemoryEntry[] {
+  const filePath = getMemoryFilePath();
+  if (!fs.existsSync(filePath)) return [];
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as MemoryEntry[];
+  } catch {
+    return [];
+  }
+}
+
+function writeEntries(entries: MemoryEntry[]): void {
+  fs.writeFileSync(getMemoryFilePath(), JSON.stringify(entries, null, 2), 'utf-8');
+}
+
+/** No-op kept for API compatibility — there is no file handle/connection to release. */
+export function closeDb(): void {
+  cachedPath = null;
+}
+
+export function saveMemory(
+  projectId: string,
+  key: string,
+  value: string,
+  metadata?: string
+): string {
+  const entries = readEntries();
   const now = new Date().toISOString();
-  
-  const stmt = db.prepare(`
-    INSERT INTO project_memory (project_id, key, value, metadata, updated_at)
-    VALUES (?, ?, ?, ?, ?)
-    ON CONFLICT(project_id, key) DO UPDATE SET
-      value = excluded.value,
-      metadata = excluded.metadata,
-      updated_at = excluded.updated_at
-  `);
-  
-  const result = stmt.run(projectId, key, value, metadata || null, now);
-  return result.lastInsertRowid.toString();
+
+  // Upsert on (project_id, key) — same uniqueness constraint the old
+  // SQLite schema enforced with `UNIQUE(project_id, key)`.
+  const existingIndex = entries.findIndex(
+    (e) => e.project_id === projectId && e.key === key
+  );
+
+  if (existingIndex >= 0) {
+    const updated: MemoryEntry = {
+      ...entries[existingIndex],
+      value,
+      metadata,
+      updated_at: now,
+    };
+    entries[existingIndex] = updated;
+    writeEntries(entries);
+    return updated.id.toString();
+  }
+
+  const nextId = entries.reduce((max, e) => Math.max(max, e.id), 0) + 1;
+  const record: MemoryEntry = {
+    id: nextId,
+    project_id: projectId,
+    key,
+    value,
+    metadata,
+    updated_at: now,
+  };
+  entries.push(record);
+  writeEntries(entries);
+  return record.id.toString();
 }
 
 export function loadMemory(projectId: string, key?: string): MemoryEntry[] {
-  const db = getDb();
-  
-  if (key) {
-    const stmt = db.prepare(`
-      SELECT * FROM project_memory 
-      WHERE project_id = ? AND key = ?
-    `);
-    return stmt.all(projectId, key) as MemoryEntry[];
-  } else {
-    const stmt = db.prepare(`
-      SELECT * FROM project_memory 
-      WHERE project_id = ?
-      ORDER BY updated_at DESC
-    `);
-    return stmt.all(projectId) as MemoryEntry[];
-  }
+  const entries = readEntries();
+  const filtered = key
+    ? entries.filter((e) => e.project_id === projectId && e.key === key)
+    : entries.filter((e) => e.project_id === projectId);
+  return filtered.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
 }

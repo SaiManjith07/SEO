@@ -2,7 +2,7 @@
 /**
  * @seokit/coder-mcp — General-purpose, coding-first MCP server adapter.
  *
- * Exposes files, execution runners, and local SQLite memory storage to IDE agents.
+ * Exposes files, execution runners, and local JSON-file memory storage to IDE agents.
  */
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -11,7 +11,7 @@ import { listFiles, readFile, searchCode, applyPatch } from './tools/fileOps.js'
 import { runTests, runLint, runBuild, gitDiff } from './tools/execOps.js';
 import { saveMemory, loadMemory } from './tools/memoryOps.js';
 
-const server = new McpServer({
+export const server = new McpServer({
   name: 'coder-mcp-server',
   version: '0.1.0',
 });
@@ -233,16 +233,7 @@ server.registerTool(
 
 // ---------------------------------------------------------------------------
 
-async function main(): Promise<void> {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error('coder-mcp server running on stdio');
-}
 
-main().catch((err) => {
-  console.error('Fatal coder-mcp:', err);
-  process.exit(1);
-});
 
 export * from './tools/fileOps.js';
 export * from './tools/execOps.js';

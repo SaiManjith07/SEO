@@ -97,6 +97,9 @@ SEO/
 | `architecture/12-cursor-prompt-pack.md` | Eight copy-pasteable Cursor prompts with verification commands |
 | `architecture/13-system-architecture.md` | Historical — layers, knowledge base schema, agent loop protocol, skill packs |
 | `architecture/16-antigravity-research-task-prompt.md` | Ready-to-paste prompt for Antigravity (or any agentic IDE) to verify claims, run a worked example against a real URL, and report back |
+| `architecture/17-antigravity-code-audit-prompt.md` | **v2 — rescoped.** Ready-to-paste prompt for Antigravity to audit the actual `seokit/` source code, now correctly scoped to the real 23-package repo (was wrongly written for a 4-package snapshot) |
+| `architecture/18-seokit-codebase-analysis-report.md` | **Ground truth.** A real build+test run of all 23 packages plus targeted verification: what passes, what fails, and 5 new findings (hardcoded default credential, unresolved circular dependency, a failing orchestrator end-to-end test, untested packages, version drift) |
+| `architecture/19-antigravity-cursor-mcp-audit-prompt.md` | Ready-to-paste prompt for Antigravity to audit both MCP servers (`mcp`, `critic-mcp`) for real Cursor readiness, grounded in `18`'s verified tool/resource/prompt counts |
 
 **Working code:** `seokit/` — two MCP servers, 31 tests passing, already implements most of `architecture/15`.
 `seokit/AGENTS.md` is the project constitution; Cursor reads it automatically.

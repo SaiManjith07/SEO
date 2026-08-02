@@ -49,7 +49,7 @@ They plan, select tools, loop, evaluate results and decide next steps. That is w
    │  @seokit/core     rule engine                │
    │  @seokit/critic   benchmarks + reward        │
    │  @seokit/data     GSC · CrUX · PSI (free)    │
-   │  @seokit/memory   SQLite knowledge base      │
+   │  @seokit/memory   JSON knowledge base        │
    └──────────────────────────────────────────────┘
 ```
 
@@ -151,9 +151,10 @@ It also answers the only question that matters: *which fixes actually worked on 
 
 ### Storage
 
-**SQLite**, one file at `.seokit/memory.db` in the repo root, gitignored by default.
+**JSON Files**, located in the `.seokit/` directory at the repo root, gitignored by default.
 
-Local, zero-config, no server, survives restarts, queryable. Do not reach for Postgres — there is no multi-writer scenario here.
+Local, zero-config, no server, simple to parse, human-readable, and git-friendly.
+
 
 ---
 

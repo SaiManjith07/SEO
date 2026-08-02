@@ -126,9 +126,15 @@ export class SEOFixerEngine {
     return html;
   }
 
-  public static fixRobotsTxt(content: string): string {
-    if (content.includes('User-agent: *')) return content;
-    return `User-agent: *\nAllow: /\n\n${content}`;
+  public static fixRobotsTxt(content: string, sitemapUrl?: string): string {
+    let modified = content;
+    if (!modified.includes('User-agent: *')) {
+      modified = `User-agent: *\nAllow: /\n\n${modified}`;
+    }
+    if (sitemapUrl && !modified.includes('Sitemap:')) {
+      modified = modified.trim() + `\n\nSitemap: ${sitemapUrl}\n`;
+    }
+    return modified;
   }
 
   public static generateSitemap(urls: string[]): string {
@@ -138,6 +144,32 @@ export class SEOFixerEngine {
     }
     sitemap += `</urlset>`;
     return sitemap;
+  }
+
+  public static generateLlmsTxt(
+    siteName: string,
+    description: string,
+    pages: { title: string; url: string; description?: string }[]
+  ): string {
+    const lines = [
+      `# ${siteName}`,
+      '',
+      `> ${description}`,
+      '',
+      '## Details',
+      '',
+      'This is the primary developer and AI documentation index.',
+      '',
+      '## Page Links',
+      ''
+    ];
+
+    for (const page of pages) {
+      const desc = page.description ? `: ${page.description}` : '';
+      lines.push(`- [${page.title}](${page.url})${desc}`);
+    }
+
+    return lines.join('\n') + '\n';
   }
 
   public static saveBackupSnapshot(workspaceRoot: string, filePath: string): void {
@@ -173,7 +205,7 @@ export class SEOFixerEngine {
     try {
       // 1. Validate all fixes before making modifications
       for (const fix of fixes) {
-        const content = fs.readFileSync(fix.filePath, 'utf-8');
+        const content = fs.existsSync(fix.filePath) ? fs.readFileSync(fix.filePath, 'utf-8') : '';
         this.validateFixSafety(content, fix.fixType, fix.options);
       }
 
@@ -183,6 +215,11 @@ export class SEOFixerEngine {
         appliedSnapshots.push(fix.filePath);
 
         const modifiedContent = proposer(fix.filePath, fix.fixType, fix.options);
+        // Ensure parent directories exist
+        const dir = path.dirname(fix.filePath);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
         fs.writeFileSync(fix.filePath, modifiedContent, 'utf-8');
       }
     } catch (err) {

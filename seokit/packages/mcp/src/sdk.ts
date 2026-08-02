@@ -5,10 +5,10 @@ export class AgentSDK {
   private streamer: MCPResourceStreamer;
   private authToken: string;
 
-  constructor(registry: MCPToolRegistry, streamer: MCPResourceStreamer, authToken: string = 'seokit_secret') {
+  constructor(registry: MCPToolRegistry, streamer: MCPResourceStreamer, authToken?: string) {
     this.registry = registry;
     this.streamer = streamer;
-    this.authToken = authToken;
+    this.authToken = authToken || process.env.SEOKIT_SECRET || 'seokit_secret';
   }
 
   public async invokeTool(name: string, args: any): Promise<any> {

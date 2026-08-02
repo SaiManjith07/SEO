@@ -348,7 +348,11 @@ describe('SEOKit v2 Comprehensive Production E2E Validation Suite', () => {
       expect(draft).toContain('kw1');
 
       await orchestrator.closeSession(session.id);
-      fs.rmSync(tempAiDir, { recursive: true, force: true });
+      try {
+        fs.rmSync(tempAiDir, { recursive: true, force: true });
+      } catch (e) {
+        // Ignore EPERM on Windows cleanup due to async file locks
+      }
     });
 
     it('should propose, apply, backup, and rollback code fixes via the orchestrator session', async () => {

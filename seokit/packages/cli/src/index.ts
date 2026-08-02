@@ -55,9 +55,10 @@ export async function main() {
     }
     
     if (fs.existsSync(potentialMcpPath)) {
-        mcpCommand = process.execPath; // current node executable
-        mcpArgs = [potentialMcpPath];
-        console.log(`[SEOKit] Found local MCP module. Preferring direct execution: ${potentialMcpPath}`);
+        mcpCommand = 'node';
+        const relativePath = path.relative(targetFolder, potentialMcpPath).replace(/\\/g, '/');
+        mcpArgs = [relativePath.startsWith('.') ? relativePath : `./${relativePath}`];
+        console.log(`[SEOKit] Found local MCP module. Preferring relative execution: ${mcpArgs[0]}`);
     } else {
         console.log(`[SEOKit] Using global npx fallback for MCP execution.`);
     }

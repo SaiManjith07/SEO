@@ -35,7 +35,7 @@ export interface Finding {
   ruleId: string;
   severity: Exclude<Severity, 'off'>;
   message: string;
-  fix?: string;
+  fix: string;
   location?: Location;
   evidence?: unknown;
 }

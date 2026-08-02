@@ -16,7 +16,10 @@ describe('orchestrator agents workflow tests', () => {
 
   beforeAll(() => {
     server = http.createServer((req, res) => {
-      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.writeHead(200, { 
+        'Content-Type': 'text/html',
+        'Content-Security-Policy': "default-src 'self'"
+      });
       res.end(`
         <!DOCTYPE html>
         <html lang="en">
