@@ -1,0 +1,25 @@
+{
+  "name": "@seokit/framework-detector",
+  "version": "1.0.0",
+  "description": "SEOKit Framework Intelligence Detector.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@seokit/website": "workspace:^1.0.0",
+    "@seokit/parser": "workspace:^1.0.0",
+    "cheerio": "^1.0.0-rc.12"
+  }
+}
