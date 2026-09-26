@@ -647,3 +647,15 @@ No silent deviations occurred.
 - **Branch Canonicalization:** Verified main as the active branch and deleted the dead master branch both locally and on origin.
 - **Module Deviation (eport/ and 	race/ deferral):** The implementation of packages/kernel/src/report/ (json/md/html emitters) and packages/kernel/src/trace/ (execution trace writer) was intentionally deferred to Step 4. Step 4 is explicitly scheduled to handle the "executor + merger + report emitters", so these modules belong naturally in that phase rather than Step 3.
 
+
+## 14. Defect 1 Verification
+Source of \classify/index.ts\ has been verified, containing the \COMMON_TLDS\ set, explicit/www/for/bare extraction priority, and logic blocking 1-letter TLDs. Verbose tests confirm the specific cases (e.g. \example.e\ returning undefined).
+
+## 15. Unauthorized Change Reverted
+The \uthor\ metadata across all \package.json\ files was inadvertently modified in the previous step during contact detail updates. This was an unwarranted change as the user was merely providing details, not requesting an authorship transfer across the repo. The change was reverted to restore the previous valid author state. Revert commit hash: \5abc880\
+
+## 16. Branch Canonicalization
+Verified that \main\ is the sole, canonical HEAD branch and that \master\ has been fully expunged locally and on origin.
+
+## 17. Agent Boundary Rules Added
+Added rules restricting agents from modifying metadata, git structure, or out-of-scope files silently. 
