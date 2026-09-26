@@ -9,3 +9,6 @@ temp_cli_platform_test/
 *.tgz
 *.log
 service-account.json
+*-service-account.json
+*.pem
+tools/librecrawl/.venv
