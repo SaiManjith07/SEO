@@ -1,23 +1,16 @@
-import { ClassifiedTask } from '../classify/index.js';
+import { ClassifiedTask, ExecutionPlan, PlanStep } from '../types.js';
 import { registry } from '../index.js';
 import { OrchestrationError } from '../types.js';
+import { RunMode } from '../mode/index.js';
+import { SeoKitConfig } from '../config/index.js';
 
-export interface PlanStep {
-  id: string;
-  agentId: string;
-  dependsOn: string[];
-  params: Record<string, unknown>;
-}
-
-export interface ExecutionPlan {
-  steps: PlanStep[];
-  batches: string[][];
-  totalSteps: number;
-}
-
-export function plan(task: ClassifiedTask): ExecutionPlan {
+export function plan(
+  task: ClassifiedTask,
+  options: { mode: RunMode; config: SeoKitConfig; registry: typeof registry }
+): ExecutionPlan {
   const steps: PlanStep[] = [];
-  const agents = registry.agents.list();
+  const skipped: ExecutionPlan['skipped'] = [];
+  const agents = options.registry.agents.list();
 
   for (const cap of task.capabilities) {
     const matchingAgents = agents.filter(a => a.capabilities?.includes(cap) && a.canHandle(task));
@@ -26,14 +19,70 @@ export function plan(task: ClassifiedTask): ExecutionPlan {
       throw new Error(`no agent for capability ${cap}`);
     }
 
-    matchingAgents.sort((a, b) => {
+    // Filter by mode
+    const modeAgents = matchingAgents.filter(a => !a.modes || a.modes.includes(options.mode));
+    if (modeAgents.length === 0) {
+      skipped.push({
+        capability: cap,
+        reason: 'mode-mismatch',
+        sourceIds: [],
+        hint: `Available agents for ${cap} do not support mode ${options.mode}`
+      });
+      continue;
+    }
+
+    // Filter by data sources enabled in config
+    const availableAgents = modeAgents.filter(a => {
+      const requiredSources = a.requires?.dataSources || [];
+      if (requiredSources.length === 0) return true;
+      return requiredSources.every(src => options.config.sources[src]?.enabled);
+    });
+
+    if (availableAgents.length === 0) {
+      // Find what's missing from the top priority agent among modeAgents
+      modeAgents.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+      const topAgent = modeAgents[0];
+      const requiredSources = topAgent.requires?.dataSources || [];
+      const disabledSources = requiredSources.filter(src => !options.config.sources[src]?.enabled);
+
+      skipped.push({
+        capability: cap,
+        reason: 'source-disabled',
+        sourceIds: disabledSources,
+        hint: `seokit sources enable ${disabledSources.join(' ')}`
+      });
+      continue;
+    }
+
+    // Check credentials (for agents that are enabled)
+    const validAgents = availableAgents.filter(a => {
+      const creds = a.requires?.credentials || [];
+      return creds.every(c => process.env[c]);
+    });
+
+    if (validAgents.length === 0) {
+      availableAgents.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+      const topAgent = availableAgents[0];
+      const creds = topAgent.requires?.credentials || [];
+      const missingCreds = creds.filter(c => !process.env[c]);
+
+      skipped.push({
+        capability: cap,
+        reason: 'credentials-missing',
+        sourceIds: topAgent.requires?.dataSources || [],
+        hint: `Missing credentials: ${missingCreds.join(', ')}`
+      });
+      continue;
+    }
+
+    validAgents.sort((a, b) => {
       const pA = a.priority || 0;
       const pB = b.priority || 0;
       if (pA !== pB) return pB - pA;
       return a.id.localeCompare(b.id);
     });
 
-    const selectedAgents = matchingAgents.filter((a, idx) => idx === 0 || a.runAlongside);
+    const selectedAgents = validAgents.filter((a, idx) => idx === 0 || a.runAlongside);
 
     for (const a of selectedAgents) {
       steps.push({
@@ -97,7 +146,6 @@ export function plan(task: ClassifiedTask): ExecutionPlan {
     });
 
     if (currentBatch.length === 0) {
-      // Should not happen if acyclic, but just in case
       throw new Error('Could not resolve batches (possibly missing dependencies)');
     }
 
@@ -109,6 +157,7 @@ export function plan(task: ClassifiedTask): ExecutionPlan {
   return {
     steps,
     batches,
-    totalSteps: steps.length
+    totalSteps: steps.length,
+    skipped
   };
 }

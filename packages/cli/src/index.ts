@@ -26,8 +26,12 @@ import '@seokit/plugin-aeo';
 import '@seokit/plugin-geo';
 import '@seokit/plugin-security';
 import '@seokit/plugin-structured-data';
+import { handleCli } from './cmd.js';
 
 export async function main() {
+  const cliArgs = process.argv.slice(2);
+  if (await handleCli(cliArgs)) return;
+
   const args = process.argv;
   const command = args[2];
   

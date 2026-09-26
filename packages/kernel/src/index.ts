@@ -2,8 +2,8 @@ import { ClassifiedTask, OrchestrateOptions, OrchestrationReport, OrchestrationE
 import * as registry from './registry/index.js';
 import { validate } from './validate/engine.js';
 import { builtinValidators } from './validate/builtin/index.js';
-import { classify, ClassifiedTask } from './classify/index.js';
-import { plan, ExecutionPlan } from './plan/index.js';
+import { classify } from './classify/index.js';
+import { plan } from './plan/index.js';
 
 // Register built-in validators
 for (const v of builtinValidators) {
@@ -34,7 +34,15 @@ export async function orchestrate(taskStr: string, options?: OrchestrateOptions)
     throw new OrchestrationError(intakeResult.gate, f.validatorId, f.agentId, f.raw, f.message);
   }
   
-  const p = plan(task);
+  const config = options?.config || {
+    version: 1,
+    goals: [],
+    sources: {},
+    modes: { dev: { blockOnFail: false }, prod: { schedule: '0 0 * * *', alertWebhook: null } }
+  };
+  const mode = options?.mode || 'dev';
+  
+  const p = plan(task, { mode, config, registry });
   
   const planResult = await validate('plan.build', p, { task, registry });
   if (!planResult.passed) {
@@ -50,7 +58,8 @@ export async function orchestrate(taskStr: string, options?: OrchestrateOptions)
     plan: p,
     metrics: { totalSteps: p.totalSteps, successfulSteps: 0, coverage: 0 },
     findings: [],
-    validation: { intake: intakeResult, plan: planResult }
+    validation: { intake: intakeResult, plan: planResult },
+    skipped: p.skipped
   };
 }
 
@@ -73,3 +82,6 @@ function buildIntakeContext(task: ClassifiedTask) {
 
 export { registry };
 export * from './types.js';
+export * from './registry/data-sources.js';
+export * from './config/index.js';
+export * from './mode/index.js';

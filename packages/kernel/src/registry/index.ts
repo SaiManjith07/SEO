@@ -1,6 +1,6 @@
 import { Agent, Tool } from '../types.js';
 
-class MapRegistry<T extends { id: string }> {
+export class MapRegistry<T extends { id: string }> {
   private items = new Map<string, T>();
 
   register(item: T) {
@@ -31,3 +31,6 @@ export const tools = new MapRegistry<Tool>();
 export const plugins = new MapRegistry<{ id: string, [key: string]: any }>();
 export const validators = new MapRegistry<any>();
 export const adapters = new MapRegistry<{ id: string, [key: string]: any }>();
+import { DataSource } from './data-sources.js';
+export const dataSources = new MapRegistry<DataSource>();
+export * from './data-sources.js';

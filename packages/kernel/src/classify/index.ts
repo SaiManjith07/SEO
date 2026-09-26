@@ -1,12 +1,5 @@
 import { registry } from '../index.js';
-
-export interface ClassifiedTask {
-  goal: string;
-  capabilities: string[];
-  params: Record<string, unknown>;
-  rawInput: string;
-  confidence: 'high' | 'medium' | 'low';
-}
+import { ClassifiedTask } from '../types.js';
 
 const COMMON_TLDS = new Set([
   'com','org','net','io','dev','app','co','ai','tech','xyz',

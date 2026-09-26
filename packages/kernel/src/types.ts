@@ -4,14 +4,11 @@ import { z } from 'zod';
  * Natural language task parsed into capabilities and goals.
  */
 export interface ClassifiedTask {
-  /** The natural language goal (e.g. "unknown" if not classified properly) */
   goal: string;
-  /** The specific capabilities required (e.g., 'audit', 'performance') */
   capabilities: string[];
-  /** Target URLs or domains extracted */
-  targets?: string[];
-  /** Additional inferred context */
-  context?: Record<string, any>;
+  params: Record<string, unknown>;
+  rawInput: string;
+  confidence: 'high' | 'medium' | 'low';
 }
 
 /**
@@ -61,10 +58,12 @@ export interface Agent<TInput = any> {
   version: string;
   priority?: number;
   runAlongside?: boolean;
+  modes?: ('dev' | 'prod')[];
   capabilities: string[];
   requires?: {
     credentials?: string[];
     peers?: string[]; // Agent IDs required to run before this agent
+    dataSources?: string[];
   };
   inputSchema: z.ZodType<TInput>;
   outputSchema: z.ZodType<any>;
@@ -75,17 +74,26 @@ export interface Agent<TInput = any> {
 /**
  * Step within an execution plan.
  */
-export interface ExecutionStep {
+export interface PlanStep {
+  id: string;
   agentId: string;
-  input: any;
+  dependsOn: string[];
+  params: Record<string, unknown>;
 }
 
 /**
  * Execution plan with parallel batches.
  */
 export interface ExecutionPlan {
-  /** Arrays of steps that can be run concurrently. Each batch depends on the previous ones. */
-  batches: ExecutionStep[][];
+  steps: PlanStep[];
+  batches: string[][];
+  totalSteps: number;
+  skipped: Array<{
+    capability: string;
+    reason: 'mode-mismatch' | 'source-disabled' | 'credentials-missing';
+    sourceIds: string[];
+    hint: string;              // e.g. 'seokit sources enable crux'
+  }>;
 }
 
 /**
@@ -118,6 +126,8 @@ export interface OrchestrationReport {
 export interface OrchestrateOptions {
   traceFile?: string;
   failFast?: boolean;
+  config?: any; // SeoKitConfig
+  mode?: 'dev' | 'prod';
 }
 
 /**
