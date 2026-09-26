@@ -11,4 +11,5 @@ temp_cli_platform_test/
 service-account.json
 *-service-account.json
 *.pem
-tools/librecrawl/.venv
+tools/librecrawl/.venvtools/librecrawl/.venv/
+tools/librecrawl/__pycache__/
