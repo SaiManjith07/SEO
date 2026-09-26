@@ -1,6 +1,7 @@
 {
   "name": "@seokit/providers",
-  "version": "1.0.0",
+  "version": "",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Target Resource Acquisition Providers.",
   "type": "module",
   "main": "./dist/index.js",

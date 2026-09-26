@@ -1,6 +1,7 @@
 {
   "name": "@seokit/core",
-  "version": "1.0.0",
+  "version": "",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "Framework-agnostic SEO/AEO/GEO rule engine.",
   "type": "module",
   "main": "./dist/index.js",

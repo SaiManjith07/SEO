@@ -1,6 +1,7 @@
 {
   "name": "@seokit/mcp",
-  "version": "3.0.0",
+  "version": "",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit v3 Model Context Protocol (MCP) server.",
   "type": "module",
   "bin": { "seokit-mcp": "./dist/index.js" },

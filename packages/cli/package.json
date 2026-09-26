@@ -1,6 +1,7 @@
 {
   "name": "@seokit/cli",
-  "version": "3.0.0",
+  "version": "",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit v3 Platform CLI Client.",
   "type": "module",
   "main": "./dist/index.js",

@@ -1,6 +1,7 @@
 {
   "name": "@seokit/website",
-  "version": "1.0.0",
+  "version": "",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Canonical Website and Page Models.",
   "type": "module",
   "main": "./dist/index.js",

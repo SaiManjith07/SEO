@@ -1,6 +1,7 @@
 {
   "name": "@seokit/sdk",
-  "version": "1.0.0",
+  "version": "",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "Official SDK for building and loading third-party SEOKit plugins.",
   "type": "module",
   "main": "./dist/index.js",

@@ -1,6 +1,7 @@
 {
   "name": "@seokit/diagnostics",
-  "version": "1.0.0",
+  "version": "",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Diagnostics translation layer.",
   "type": "module",
   "main": "./dist/index.js",

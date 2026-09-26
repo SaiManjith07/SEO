@@ -1,6 +1,7 @@
 {
   "name": "@seokit/coder-mcp",
-  "version": "1.0.0",
+  "version": "",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "General-purpose, coding-first MCP server for IDE integration.",
   "type": "module",
   "bin": {

@@ -1,6 +1,7 @@
 {
   "name": "@seokit/critic-aeolint",
-  "version": "3.0.0",
+  "version": "",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
