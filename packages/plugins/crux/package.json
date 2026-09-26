@@ -10,8 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@seokit/core": "workspace:*",
-    "crux-api": "^4.1.0"
+    "@seokit/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.3.3",

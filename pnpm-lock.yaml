@@ -382,9 +382,6 @@ importers:
       '@seokit/core':
         specifier: workspace:*
         version: link:../../core
-      crux-api:
-        specifier: ^4.1.0
-        version: 4.1.0
     devDependencies:
       typescript:
         specifier: ^5.3.3
@@ -1014,9 +1011,6 @@ packages:
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
-
-  crux-api@4.1.0:
-    resolution: {integrity: sha512-zyMkSvOFdrwEQYXZUKgZDAmKj61UnHOeNXPZBsR+FjpLLRA8qyZQ/YcW16lseKAVovTobsmYQeOoc+8mhgsbFA==}
 
   css-select@5.2.2:
     resolution: {integrity: sha512-TizTzUddG/xYLA3NXodFM0fSbNizXjOKhqiQQwvhlspadZokn1KDy0NZFS0wuEubIYAV5/c1/lAr0TaaFXEXzw==}
@@ -2150,8 +2144,6 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
-
-  crux-api@4.1.0: {}
 
   css-select@5.2.2:
     dependencies:

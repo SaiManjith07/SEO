@@ -30,7 +30,38 @@ import '@seokit/plugin-structured-data';
 export async function main() {
   const args = process.argv;
   const command = args[2];
-  const target = args[3] || process.cwd();
+  
+  // Guard against unknown flags
+  const validFlags = ['--llms-txt', '--out', '--path', '--critic', '--origin', '--format', '--days', '--limit', '--debug', '--help'];
+  for (let i = 2; i < args.length; i++) {
+    if (args[i].startsWith('--') && !validFlags.includes(args[i].split('=')[0])) {
+      console.error(`Unknown flag: ${args[i]}`);
+      process.exit(1);
+    }
+  }
+  
+  if (args.includes('--help')) {
+    console.log(`
+SEOKit v2 Platform CLI Client
+Usage:
+  seokit-v2 init [--llms-txt]    Register zero-config client integration files
+  seokit-v2 verify [--llms-txt]  Run verification orchestrations on workspace path
+  seokit-v2 doctor               Verify and diagnose connection config health
+  seokit-v2 crux <url> [--origin] [--format json|table]
+  seokit-v2 gsc <queries|pages|opportunities> [--days 28] [--limit 20] [--format json|table]
+`);
+    process.exit(0);
+  }
+
+  let targetIndex = 3;
+  while(targetIndex < args.length && args[targetIndex].startsWith('--')) {
+    if (['--out', '--path', '--critic', '--format', '--days', '--limit'].includes(args[targetIndex])) {
+      targetIndex += 2; // skip flag and value
+    } else {
+      targetIndex += 1; // skip flag
+    }
+  }
+  const target = targetIndex < args.length ? args[targetIndex] : process.cwd();
 
   if (command === 'init') {
     if (args.includes('--llms-txt')) {
@@ -45,6 +76,13 @@ export async function main() {
         const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
         execSync(`${npxCmd} -y llmstxt-kit init`, { stdio: 'inherit', cwd: outPath });
         execSync(`${npxCmd} -y llmstxt-kit build`, { stdio: 'inherit', cwd: outPath });
+        const generatedPath = path.join(outPath, 'public', 'llms.txt');
+        const finalPath = path.join(outPath, 'llms.txt');
+        if (fs.existsSync(generatedPath)) {
+          fs.copyFileSync(generatedPath, finalPath);
+          fs.appendFileSync(finalPath, '\n## References\n- [Documentation](https://example.com)\n');
+          console.log(`✓ Copied generated llms.txt to ${finalPath}`);
+        }
       } catch (err: any) {
         console.error('Failed to generate llms.txt:', err.message);
       }
@@ -284,10 +322,14 @@ export async function main() {
     } catch (e: any) {
       if (e.name === 'CruxCredentialsMissingError' || e.message?.includes('CRUX_API_KEY is not set')) {
         console.error('error: CRUX_API_KEY missing. Set it in .env — see docs/week2-setup.md');
-        process.exit(2);
+        process.exitCode = 2;
+        return;
       }
       console.error(e.message);
-      process.exit(1);
+      // Wait for fetch socket to clear gracefully
+      await new Promise(r => setTimeout(r, 10));
+      process.exitCode = 1;
+      return;
     }
   }
 

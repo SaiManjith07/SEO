@@ -1,5 +1,3 @@
-import { createQueryRecord } from 'crux-api';
-
 export class CruxCredentialsMissingError extends Error {
   constructor(message: string) {
     super(message);
@@ -7,44 +5,50 @@ export class CruxCredentialsMissingError extends Error {
   }
 }
 
-// Minimal polyfill because crux-api reads window.fetch directly, which crashes in Node.
-if (typeof window === 'undefined') {
-  (global as any).window = { fetch: globalThis.fetch };
-}
-
 export class CruxPlugin {
-  private query: any;
+  private key: string;
 
   constructor() {
     const key = process.env.CRUX_API_KEY;
     if (!key) {
       throw new CruxCredentialsMissingError('CRUX_API_KEY is not set');
     }
-    this.query = createQueryRecord({ key });
+    this.key = key;
   }
 
   async fetchRecord(urlOrOrigin: string, isOrigin: boolean = false) {
+    const endpoint = `https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=${this.key}`;
+    const payload: any = {
+      [isOrigin ? 'origin' : 'url']: urlOrOrigin
+    };
 
     try {
-      const response = await this.query({
-        [isOrigin ? 'origin' : 'url']: urlOrOrigin,
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
 
-      if (!response || !response.record || !response.record.metrics) {
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return []; // no_data returns empty array
+        }
+        if (data.error && data.error.message) {
+          throw new Error(`CrUX API Error: ${data.error.message}`);
+        }
+        throw new Error(`CrUX API Error HTTP ${response.status}`);
+      }
+
+      if (!data || !data.record || !data.record.metrics) {
         return [];
       }
 
-      return [response.record];
+      return [data.record];
     } catch (err: any) {
-      if (err.message?.includes('API_KEY_INVALID')) {
-        throw new Error('CRUX_API_KEY is invalid');
-      }
-      if (err.message?.includes('quota')) {
-        throw new Error('CrUX API rate limit exceeded');
-      }
-      if (err.message?.includes('not found') || err.message?.includes('no data')) {
-        return []; // no_data returns empty array
-      }
       throw new Error(`CrUX network error: ${err.message}`);
     }
   }
