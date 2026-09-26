@@ -1,0 +1,15 @@
+# Agent Boundaries
+
+Agents MUST NOT modify the following without an explicit user 
+request in the same conversation:
+- package.json \uthor\, \license\, \epository\, or \unding\ 
+  fields
+- .gitignore entries
+- Git branch structure (creating/deleting branches)
+- Git remote configuration
+- Files outside the specific package named in the task
+- Docs files that were not mentioned in the task
+
+If an agent believes such a change is necessary, it MUST ask 
+first and wait for approval. Silent scope expansion is a 
+policy violation.
