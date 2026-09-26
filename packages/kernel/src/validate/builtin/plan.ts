@@ -67,13 +67,7 @@ export const planDepsAvailable: KernelValidator = {
           return { ok: false, message: `Agent ${step.agentId} is not in the registry` };
         }
         
-        if (agent.requires?.credentials) {
-          for (const cred of agent.requires.credentials) {
-            if (!process.env[cred]) {
-              return { ok: false, message: `Required credential ${cred} for agent ${step.agentId} is missing in env` };
-            }
-          }
-        }
+        // Credentials check is handled by credentialsPresent and credentialsValid validators.
       }
     }
     return { ok: true };

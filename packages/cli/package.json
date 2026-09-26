@@ -1,6 +1,6 @@
 {
   "name": "@seokit/cli",
-  "version": "",
+  "version": "1.0.0",
   "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit v3 Platform CLI Client.",
   "type": "module",
@@ -20,7 +20,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@seokit/critic-aeolint": "workspace:*",
+    "@seokit/critic-aeolint": "workspace:*", "@seokit/kernel": "workspace:*", "@seokit/sources": "workspace:*",
     "@seokit/diagnostics": "workspace:*",
     "@seokit/events": "workspace:^1.0.0",
     "@seokit/mcp": "workspace:*",

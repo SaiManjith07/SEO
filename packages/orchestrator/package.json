@@ -1,6 +1,6 @@
 {
   "name": "@seokit/orchestrator",
-  "version": "",
+  "version": "1.0.0",
   "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "Multi-agent coordination orchestrator for SEO/AEO/GEO/LLMO automation.",
   "type": "module",

@@ -1,6 +1,6 @@
 {
   "name": "@seokit/parser",
-  "version": "",
+  "version": "1.0.0",
   "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Resource and DOM Parser Pipeline.",
   "type": "module",

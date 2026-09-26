@@ -7,6 +7,8 @@ import { planNoCycles, planDepsAvailable } from './plan.js';
 import { mergeNoConflict, mergeCoverage } from './merge.js';
 import { reportNoSecrets } from './secrets.js';
 
+import { provenanceModeCompatible } from './provenance-mode.js';
+
 export const builtinValidators = [
   credentialsPresent,
   credentialsValid,
@@ -18,6 +20,7 @@ export const builtinValidators = [
   findingHasEvidence,
   findingNoFabrication,
   provenanceLive,
+  provenanceModeCompatible,
   exitCodeSafe,
   planNoCycles,
   planDepsAvailable,

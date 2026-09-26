@@ -4,9 +4,11 @@ import { OrchestrationError } from '../types.js';
 import { RunMode } from '../mode/index.js';
 import { SeoKitConfig } from '../config/index.js';
 
+import { FixtureAdapter } from '../fixtures/index.js';
+
 export function plan(
   task: ClassifiedTask,
-  options: { mode: RunMode; config: SeoKitConfig; registry: typeof registry }
+  options: { mode: RunMode; config: SeoKitConfig; registry: typeof registry; fixtureAdapter?: FixtureAdapter }
 ): ExecutionPlan {
   const steps: PlanStep[] = [];
   const skipped: ExecutionPlan['skipped'] = [];
@@ -26,6 +28,7 @@ export function plan(
         capability: cap,
         reason: 'mode-mismatch',
         sourceIds: [],
+        requiredMode: options.mode,
         hint: `Available agents for ${cap} do not support mode ${options.mode}`
       });
       continue;
@@ -57,6 +60,11 @@ export function plan(
     // Check credentials (for agents that are enabled)
     const validAgents = availableAgents.filter(a => {
       const creds = a.requires?.credentials || [];
+      if (options.mode === 'dev' && options.fixtureAdapter) {
+         const sources = a.requires?.dataSources || [];
+         const hasFixtures = sources.some(src => options.fixtureAdapter!.hasAny?.(src) || options.fixtureAdapter!.has(src, 'example-com-url'));
+         if (hasFixtures) return true;
+      }
       return creds.every(c => process.env[c]);
     });
 
@@ -70,6 +78,7 @@ export function plan(
         capability: cap,
         reason: 'credentials-missing',
         sourceIds: topAgent.requires?.dataSources || [],
+        credentials: missingCreds,
         hint: `Missing credentials: ${missingCreds.join(', ')}`
       });
       continue;

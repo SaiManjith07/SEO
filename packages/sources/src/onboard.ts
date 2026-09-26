@@ -1,4 +1,4 @@
-import { loadConfig, saveConfig } from '../../kernel/src/index.js';
+import { loadConfig, saveConfig } from '@seokit/kernel';
 import { suggest } from './suggest.js';
 import { builtinSources } from './catalog.js';
 // Using a mock prompt for demonstration to avoid external deps

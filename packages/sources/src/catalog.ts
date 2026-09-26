@@ -1,4 +1,4 @@
-import { DataSource } from '../../kernel/src/index.js';
+import { DataSource } from '@seokit/kernel';
 
 export const builtinSources: DataSource[] = [
   {
@@ -7,6 +7,7 @@ export const builtinSources: DataSource[] = [
     description: 'Field performance data from real Chrome users',
     provides: ['performance'],
     modes: ['prod'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: ['CRUX_API_KEY'], network: true },
     cost: 'free',
     suggestFor: ['traditional-seo', 'performance']
@@ -17,6 +18,7 @@ export const builtinSources: DataSource[] = [
     description: 'Search performance and index coverage',
     provides: ['rank', 'indexing'],
     modes: ['prod'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: ['GSC_SERVICE_ACCOUNT_PATH', 'GSC_PROPERTY_URL'], network: true },
     cost: 'free',
     suggestFor: ['traditional-seo', 'rank-tracking']
@@ -27,6 +29,7 @@ export const builtinSources: DataSource[] = [
     description: 'Bing search performance and index coverage',
     provides: ['rank', 'indexing'],
     modes: ['prod'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: ['BING_API_KEY', 'BING_SITE_URL'], network: true },
     cost: 'free',
     suggestFor: ['traditional-seo']
@@ -37,6 +40,7 @@ export const builtinSources: DataSource[] = [
     description: 'Traffic and engagement metrics',
     provides: ['traffic'],
     modes: ['prod'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: ['GA4_SERVICE_ACCOUNT_PATH', 'GA4_PROPERTY_ID'], network: true },
     cost: 'free',
     suggestFor: ['traditional-seo', 'traffic-analysis']
@@ -47,6 +51,7 @@ export const builtinSources: DataSource[] = [
     description: 'AI Visibility tracking',
     provides: ['aeo'],
     modes: ['prod'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: ['ELMO_API_URL'], network: true },
     cost: 'free',
     suggestFor: ['ai-visibility']
@@ -57,6 +62,7 @@ export const builtinSources: DataSource[] = [
     description: 'Knowledge graph entity extraction',
     provides: ['entities'],
     modes: ['dev', 'prod'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: [], network: true },
     cost: 'free',
     suggestFor: ['traditional-seo', 'entities']
@@ -67,6 +73,7 @@ export const builtinSources: DataSource[] = [
     description: 'Sitemap parsing and diffing',
     provides: ['sitemaps'],
     modes: ['dev', 'prod'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: [], network: true },
     cost: 'free',
     suggestFor: ['traditional-seo', 'technical']
@@ -77,6 +84,7 @@ export const builtinSources: DataSource[] = [
     description: 'Large-scale web crawl data for backlinks',
     provides: ['backlinks'],
     modes: ['prod'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: ['GCP_PROJECT'], network: true },
     cost: 'free-tier',
     suggestFor: ['off-site', 'backlinks']
@@ -87,6 +95,7 @@ export const builtinSources: DataSource[] = [
     description: 'Reddit mentions and discussions',
     provides: ['social'],
     modes: ['prod'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: ['APIFY_API_TOKEN'], network: true },
     cost: 'free-tier',
     suggestFor: ['off-site', 'social']

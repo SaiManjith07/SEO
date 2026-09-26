@@ -1,6 +1,6 @@
 {
   "name": "@seokit/kernel",
-  "version": "",
+  "version": "1.0.0",
   "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit orchestration kernel",
   "type": "module",

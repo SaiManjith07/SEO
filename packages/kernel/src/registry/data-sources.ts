@@ -11,6 +11,10 @@ export interface DataSource {
     network: boolean;
     install?: string;
   };
+  backends: {
+    dev: 'fixture' | 'live' | 'unavailable';
+    prod: 'fixture' | 'live' | 'unavailable';
+  };
   cost: 'free' | 'free-tier' | 'paid';
   costNotes?: string;
   suggestFor: string[];

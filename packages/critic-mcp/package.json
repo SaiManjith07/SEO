@@ -1,6 +1,6 @@
 {
   "name": "@seokit/critic-mcp",
-  "version": "",
+  "version": "1.0.0",
   "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "MCP server that independently grades sites against published benchmarks and emits a reward signal.",
   "type": "module",

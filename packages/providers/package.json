@@ -1,6 +1,6 @@
 {
   "name": "@seokit/providers",
-  "version": "",
+  "version": "1.0.0",
   "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Target Resource Acquisition Providers.",
   "type": "module",

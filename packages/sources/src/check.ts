@@ -1,4 +1,4 @@
-import { DataSource } from '../../kernel/src/index.js';
+import { DataSource } from '@seokit/kernel';
 
 export function checkSource(source: DataSource, env: NodeJS.ProcessEnv): {
   configured: boolean;

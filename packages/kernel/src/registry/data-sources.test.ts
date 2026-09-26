@@ -13,6 +13,7 @@ describe('dataSources registry', () => {
     description: 'A test source',
     provides: ['test-data'],
     modes: ['dev'],
+    backends: { dev: 'fixture', prod: 'live' },
     requires: { credentials: [], network: false },
     cost: 'free',
     suggestFor: ['testing']

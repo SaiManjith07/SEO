@@ -29,6 +29,9 @@ importers:
       '@seokit/events':
         specifier: workspace:^1.0.0
         version: link:../events
+      '@seokit/kernel':
+        specifier: workspace:*
+        version: link:../kernel
       '@seokit/mcp':
         specifier: workspace:*
         version: link:../mcp
@@ -65,6 +68,9 @@ importers:
       '@seokit/plugins-competitive':
         specifier: workspace:^
         version: link:../plugins/competitive
+      '@seokit/sources':
+        specifier: workspace:*
+        version: link:../sources
       '@seokit/workspace':
         specifier: workspace:^1.0.0
         version: link:../workspace
@@ -556,6 +562,19 @@ importers:
       '@seokit/core':
         specifier: workspace:^1.0.0
         version: link:../core
+
+  packages/sources:
+    dependencies:
+      '@seokit/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+    devDependencies:
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@22.20.1)
 
   packages/website:
     devDependencies:

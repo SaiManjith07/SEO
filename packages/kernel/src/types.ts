@@ -11,6 +11,14 @@ export interface ClassifiedTask {
   confidence: 'high' | 'medium' | 'low';
 }
 
+export interface ToolResult<T = unknown> {
+  data: T;
+  httpStatus?: number;
+  provenance: 'live' | 'fixture' | 'cache';
+  sourceId: string;
+  fixtureKey?: string;
+}
+
 /**
  * Represents a tool registered in the kernel.
  */
@@ -26,7 +34,7 @@ export interface Tool<TInput = any, TOutput = any> {
  * Provides access to tools and other context for an executing agent.
  */
 export interface AgentContext {
-  tool: <TOutput = any>(id: string, input: any) => Promise<TOutput>;
+  tool: (id: string, input: any) => Promise<ToolResult<any>>;
 }
 
 /**
@@ -48,6 +56,8 @@ export interface AgentResult {
   confidence: 'high' | 'medium' | 'low';
   /** Any non-fatal errors encountered during execution */
   errors: string[];
+  sourceId?: string;
+  fixtureKey?: string;
 }
 
 /**
@@ -92,6 +102,8 @@ export interface ExecutionPlan {
     capability: string;
     reason: 'mode-mismatch' | 'source-disabled' | 'credentials-missing';
     sourceIds: string[];
+    credentials?: string[];
+    requiredMode?: string;
     hint: string;              // e.g. 'seokit sources enable crux'
   }>;
 }

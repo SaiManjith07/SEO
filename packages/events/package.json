@@ -1,6 +1,6 @@
 {
   "name": "@seokit/events",
-  "version": "",
+  "version": "1.0.0",
   "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Central Platform Event Bus.",
   "type": "module",

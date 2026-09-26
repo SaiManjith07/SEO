@@ -1,6 +1,6 @@
 {
   "name": "@seokit/workspace",
-  "version": "",
+  "version": "1.0.0",
   "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Workspace Management and project lifecycles.",
   "type": "module",

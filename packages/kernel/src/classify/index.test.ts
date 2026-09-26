@@ -83,4 +83,10 @@ describe('classify', () => {
     const res = classify('check core web vitals on staging.example.com');
     expect(res.params.url).toBe('staging.example.com');
   });
+
+  it('returns both audit and performance when keywords match', () => {
+    const res = classify('audit mysite.com for core web vitals');
+    expect(res.capabilities).toContain('audit');
+    expect(res.capabilities).toContain('performance');
+  });
 });

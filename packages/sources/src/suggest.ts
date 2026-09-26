@@ -1,4 +1,4 @@
-import { DataSource } from '../../kernel/src/index.js';
+import { DataSource } from '@seokit/kernel';
 import { builtinSources } from './catalog.js';
 
 export function suggest(goals: string[]): {
