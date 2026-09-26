@@ -31,32 +31,6 @@ describe('SEOKit v3 AI Intelligence & Platform Tests', () => {
     expect(seoCluster?.monthlyVolume).toBe(9700);
   });
 
-  it('should find content gaps against competitor keywords', () => {
-    const ourKeywords = ['seo software tools', 'seo audit'];
-    const competitorKeywords = ['seo software tools', 'competitor content gaps', 'backlink strategies'];
-
-    const gaps = AIIntelligenceEngine.analyzeCompetitorGaps(ourKeywords, competitorKeywords);
-    expect(gaps.length).toBe(2);
-    expect(gaps[0].keyword).toBe('competitor content gaps');
-    expect(gaps[0].ourRank).toBeNull();
-  });
-
-  it('should identify high-value backlink opportunities and toxic links', () => {
-    const backlinks = [
-      { url: 'https://highauthorityblog.com/resource', domainAuthority: 72 },
-      { url: 'https://spammycheapnetwork.biz/link', domainAuthority: 6 }
-    ];
-
-    const audit = AIIntelligenceEngine.auditBacklinks(backlinks);
-    expect(audit.opportunities.length).toBe(1);
-    expect(audit.opportunities[0].domain).toBe('highauthorityblog.com');
-    expect(audit.opportunities[0].opportunityType).toBe('resource-page');
-
-    expect(audit.toxic.length).toBe(1);
-    expect(audit.toxic[0].url).toBe('https://spammycheapnetwork.biz/link');
-    expect(audit.toxic[0].toxicScore).toBe(85);
-  });
-
   it('should produce SEO-optimized draft articles with target keywords', () => {
     const topic = 'AI Search Optimization';
     const keywords = ['AI search ranks', 'llm optimize'];

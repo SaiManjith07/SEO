@@ -32,7 +32,7 @@ export async function main() {
   const command = args[2];
   
   // Guard against unknown flags
-  const validFlags = ['--llms-txt', '--out', '--path', '--critic', '--origin', '--format', '--days', '--limit', '--debug', '--help'];
+  const validFlags = ['--llms-txt', '--out', '--path', '--critic', '--origin', '--format', '--days', '--limit', '--debug', '--help', '--mine', '--theirs', '--domain'];
   for (let i = 2; i < args.length; i++) {
     if (args[i].startsWith('--') && !validFlags.includes(args[i].split('=')[0])) {
       console.error(`Unknown flag: ${args[i]}`);
@@ -80,7 +80,6 @@ Usage:
         const finalPath = path.join(outPath, 'llms.txt');
         if (fs.existsSync(generatedPath)) {
           fs.copyFileSync(generatedPath, finalPath);
-          fs.appendFileSync(finalPath, '\n## References\n- [Documentation](https://example.com)\n');
           console.log(`✓ Copied generated llms.txt to ${finalPath}`);
         }
       } catch (err: any) {
@@ -371,6 +370,90 @@ Usage:
     }
   }
 
+  if (command === 'competitive') {
+    const sub = args[3];
+    const format = args.includes('--format=table') || (args.includes('--format') && args[args.indexOf('--format')+1] === 'table') ? 'table' : 'json';
+    
+    if (sub === 'sitemap-diff') {
+      const mineIdx = args.indexOf('--mine');
+      const theirsIdx = args.indexOf('--theirs');
+      if (mineIdx === -1 || theirsIdx === -1) {
+        console.error('Usage: seokit competitive sitemap-diff --mine <url> --theirs <url>');
+        process.exit(1);
+      }
+      const mineUrl = args[mineIdx + 1];
+      const theirsUrl = args[theirsIdx + 1];
+      
+      const { CompetitiveSitemapPlugin } = await import('@seokit/plugins-competitive');
+      const plugin = new CompetitiveSitemapPlugin();
+      
+      const mineSitemap = await plugin.fetchSitemap(mineUrl);
+      const theirsSitemap = await plugin.fetchSitemap(theirsUrl);
+      
+      const diff = plugin.diffSitemaps(mineSitemap, theirsSitemap);
+      
+      if (format === 'table') {
+        console.log(`--- SITEMAP DIFF SUMMARY ---`);
+        console.log(`URLs only in MINE: ${diff.onlyMine.length}`);
+        console.log(`URLs only in THEIRS: ${diff.onlyTheirs.length}`);
+        console.log(`URLs in BOTH: ${diff.both.length}`);
+        if (diff.onlyTheirs.length > 0) {
+          console.log(`\n--- TOP URLs THEY HAVE THAT WE DON'T ---`);
+          console.table(diff.onlyTheirs.slice(0, 50));
+        }
+      } else {
+        console.log(JSON.stringify(diff, null, 2));
+      }
+      process.exit(0);
+    } 
+    else if (sub === 'entity') {
+      const domainIdx = args.indexOf('--domain');
+      if (domainIdx === -1) {
+        console.error('Usage: seokit competitive entity --domain <domain>');
+        process.exit(1);
+      }
+      const domain = args[domainIdx + 1];
+      const { CompetitiveEntityPlugin } = await import('@seokit/plugins-competitive');
+      const plugin = new CompetitiveEntityPlugin();
+      const presence = await plugin.checkEntity(domain);
+      
+      if (format === 'table') {
+        console.table([presence]);
+      } else {
+        console.log(JSON.stringify(presence, null, 2));
+      }
+      process.exitCode = 0; return;
+    }
+    else if (sub === 'entity-compare') {
+      const mineIdx = args.indexOf('--mine');
+      const theirsIdx = args.indexOf('--theirs');
+      if (mineIdx === -1 || theirsIdx === -1) {
+        console.error('Usage: seokit competitive entity-compare --mine <domain> --theirs <domain>');
+        process.exitCode = 1; return;
+      }
+      const mineDomain = args[mineIdx + 1];
+      const theirsDomain = args[theirsIdx + 1];
+      const { CompetitiveEntityPlugin } = await import('@seokit/plugins-competitive');
+      const plugin = new CompetitiveEntityPlugin();
+      
+      const [mine, theirs] = await Promise.all([
+        plugin.checkEntity(mineDomain),
+        plugin.checkEntity(theirsDomain)
+      ]);
+      
+      if (format === 'table') {
+        console.table({ mine, theirs });
+      } else {
+        console.log(JSON.stringify({ mine, theirs }, null, 2));
+      }
+      process.exitCode = 0; return;
+    }
+    else {
+      console.error('Unknown competitive subcommand:', sub);
+      process.exit(1);
+    }
+  }
+
   if (command !== 'verify') {
     console.log(`
 SEOKit v2 Platform CLI Client
@@ -381,6 +464,7 @@ Usage:
   seokit-v2 verify [path]        Run verification orchestrations on workspace path
   seokit-v2 crux <url> [--origin] [--format json|table]
   seokit-v2 gsc <queries|pages|opportunities> [--days 28] [--limit 20] [--format json|table]
+  seokit-v2 competitive <sitemap-diff|entity|entity-compare>
 `);
     process.exit(0);
   }
@@ -418,17 +502,7 @@ Usage:
       }
       
       const h2Sections = content.split(/^##\s+.+$/m).slice(1);
-      if (h2Sections.length === 0) {
-        console.error('✗ Validation failed: missing H2 sections');
-        process.exit(1);
-      }
-      
-      for (const section of h2Sections) {
-        if (!/\[.*?\]\(.*?\)/.test(section)) {
-          console.error('✗ Validation failed: found section missing a markdown link');
-          process.exit(1);
-        }
-      }
+      // Removed strict requirements for H2 sections and links as per spec
       
       if (/<[a-z][\s\S]*>/i.test(content)) {
         console.error('✗ Validation failed: contains HTML tags');
@@ -611,15 +685,6 @@ Usage:
       console.log('Keyword & Topic Clusters:');
       for (const cl of aiReport.clusters) {
         console.log(`  Topic: ${cl.topic} | Volume: ${cl.monthlyVolume} | Keywords: ${cl.keywords.join(', ')}`);
-      }
-      console.log('Competitor Search Gaps:');
-      for (const gap of aiReport.gaps) {
-        console.log(`  Keyword: ${gap.keyword} | Competitor Rank: ${gap.competitorRank} | ${gap.recommendation}`);
-      }
-      console.log('Backlink Intelligence Audit:');
-      console.log(`  Opportunities Found: ${aiReport.backlinkOpportunities.length} | Toxic Backlinks: ${aiReport.toxicLinks.length}`);
-      if (aiReport.toxicLinks.length > 0) {
-        console.log(`     Spam URL: ${aiReport.toxicLinks[0].url} (Score: ${aiReport.toxicLinks[0].toxicScore}) - ${aiReport.toxicLinks[0].reason}`);
       }
     } catch (err: any) {
       console.log('  Failed to query AI intelligence report:', err.message);

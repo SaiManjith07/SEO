@@ -20,20 +20,28 @@ export function plan(task: ClassifiedTask): ExecutionPlan {
   const agents = registry.agents.list();
 
   for (const cap of task.capabilities) {
-    let found = false;
-    for (const a of agents) {
-      if (a.capabilities?.includes(cap) && a.canHandle(task)) {
-        steps.push({
-          id: a.id,
-          agentId: a.id,
-          dependsOn: a.requires?.peers || [],
-          params: task.params
-        });
-        found = true;
-      }
-    }
-    if (!found) {
+    const matchingAgents = agents.filter(a => a.capabilities?.includes(cap) && a.canHandle(task));
+    
+    if (matchingAgents.length === 0) {
       throw new Error(`no agent for capability ${cap}`);
+    }
+
+    matchingAgents.sort((a, b) => {
+      const pA = a.priority || 0;
+      const pB = b.priority || 0;
+      if (pA !== pB) return pB - pA;
+      return a.id.localeCompare(b.id);
+    });
+
+    const selectedAgents = matchingAgents.filter((a, idx) => idx === 0 || a.runAlongside);
+
+    for (const a of selectedAgents) {
+      steps.push({
+        id: a.id,
+        agentId: a.id,
+        dependsOn: a.requires?.peers || [],
+        params: task.params
+      });
     }
   }
 

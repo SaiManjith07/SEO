@@ -8,6 +8,11 @@ export interface ClassifiedTask {
   confidence: 'high' | 'medium' | 'low';
 }
 
+const COMMON_TLDS = new Set([
+  'com','org','net','io','dev','app','co','ai','tech','xyz',
+  'uk','de','fr','jp','in','au','ca','us','edu','gov','info','biz'
+]);
+
 const STATIC_MAPPING: Record<string, string[]> = {
   'audit': ['audit', 'review site', 'check seo'],
   'performance': ['core web vitals', 'crux', 'lcp', 'cls', 'inp'],
@@ -49,14 +54,47 @@ export function classify(input: string): ClassifiedTask {
 
   const params: Record<string, unknown> = {};
   
-  const urlMatch = input.match(/https?:\/\/[^\s]+/i);
-  if (urlMatch) {
-    params.url = urlMatch[0];
-  } else {
-    const domainMatch = input.match(/\b[a-z0-9-]+\.[a-z]{2,}\b/i);
-    if (domainMatch) {
-      params.url = domainMatch[0];
+  // 1. Explicit scheme
+  const explicitMatch = input.match(/https?:\/\/[^\s]+/i);
+  // 2. www prefix
+  const wwwMatch = input.match(/\bwww\.[a-z0-9-]+(\.[a-z0-9-]+)+/i);
+  // 3. Bare domain
+  const bareMatch = input.match(/\b([a-z0-9]([a-z0-9-]*[a-z0-9])?\.){1,4}[a-z]{2,}\b/i);
+  // 4. Explicit "for <domain>"
+  const forMatch = input.match(/\bfor\s+([a-z0-9.-]+\.[a-z]{2,})\b/i);
+
+  let urlConfidence: 'explicit' | 'inferred' | 'none' = 'none';
+
+  if (explicitMatch) {
+    params.url = explicitMatch[0];
+    urlConfidence = 'explicit';
+  } else if (wwwMatch) {
+    params.url = wwwMatch[0];
+    urlConfidence = 'explicit';
+  } else if (forMatch) {
+    const candidate = forMatch[1];
+    const tld = candidate.split('.').pop()?.toLowerCase();
+    if (tld && COMMON_TLDS.has(tld)) {
+      params.url = candidate;
+      urlConfidence = 'inferred';
     }
+  } else if (bareMatch) {
+    const candidate = bareMatch[0];
+    const tld = candidate.split('.').pop()?.toLowerCase();
+    
+    // Skip single letter TLDs (e.g. e.g)
+    // Also we skip "example.com" if not an audit request (skipped per prompt note if complex, but easy enough to just do it)
+    if (tld && tld.length > 1 && COMMON_TLDS.has(tld)) {
+      // Check if it's inside quotes: roughly we can just check if candidate is 'example.com' and skip
+      if (candidate.toLowerCase() !== 'example.com' || bestCap === 'audit') {
+        params.url = candidate;
+        urlConfidence = 'inferred';
+      }
+    }
+  }
+  
+  if (urlConfidence !== 'none') {
+    params.urlConfidence = urlConfidence;
   }
 
   const daysMatch = input.match(/\b(\d+)\s*days?\b/i);

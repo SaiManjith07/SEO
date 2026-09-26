@@ -39,9 +39,6 @@ export interface ToxicBacklink {
 export interface AIIntelligenceReport {
   recommendations: AIRecommendation[];
   clusters: KeywordCluster[];
-  gaps: ContentGap[];
-  backlinkOpportunities: BacklinkOpportunity[];
-  toxicLinks: ToxicBacklink[];
 }
 
 export class AIIntelligenceEngine {
@@ -107,51 +104,5 @@ Start by introducing ${topic} clearly to hook organic visitors.
 
     return clusters;
   }
-
-  public static analyzeCompetitorGaps(ourKeywords: string[], competitorKeywords: string[]): ContentGap[] {
-    const gaps: ContentGap[] = [];
-    const ourSet = new Set(ourKeywords.map(k => k.toLowerCase()));
-
-    for (const ck of competitorKeywords) {
-      if (!ourSet.has(ck.toLowerCase())) {
-        gaps.push({
-          keyword: ck,
-          competitorRank: 3,
-          ourRank: null,
-          volume: 2400,
-          recommendation: `Create a dedicated target landing page optimized for "${ck}".`
-        });
-      }
-    }
-
-    return gaps;
-  }
-
-  public static auditBacklinks(links: { url: string; domainAuthority: number }[]): {
-    opportunities: BacklinkOpportunity[];
-    toxic: ToxicBacklink[];
-  } {
-    const opportunities: BacklinkOpportunity[] = [];
-    const toxic: ToxicBacklink[] = [];
-
-    for (const link of links) {
-      const hostname = new URL(link.url).hostname;
-      if (link.domainAuthority > 50) {
-        opportunities.push({
-          domain: hostname,
-          domainAuthority: link.domainAuthority,
-          anchorText: 'Read More',
-          opportunityType: 'resource-page'
-        });
-      } else if (link.domainAuthority < 10) {
-        toxic.push({
-          url: link.url,
-          toxicScore: 85,
-          reason: 'Low domain authority referring site indicating potentially spammy indexing networks.'
-        });
-      }
-    }
-
-    return { opportunities, toxic };
-  }
 }
+

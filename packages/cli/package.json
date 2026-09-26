@@ -10,27 +10,30 @@
     "seokit-v2": "./dist/index.js",
     "seokit": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
-    "@seokit/orchestrator": "workspace:^1.0.0",
-    "@seokit/workspace": "workspace:^1.0.0",
-    "@seokit/events": "workspace:^1.0.0",
+    "@seokit/critic-aeolint": "workspace:*",
     "@seokit/diagnostics": "workspace:*",
+    "@seokit/events": "workspace:^1.0.0",
     "@seokit/mcp": "workspace:*",
-    "@seokit/plugin-seo": "workspace:*",
-    "@seokit/plugin-performance": "workspace:*",
+    "@seokit/orchestrator": "workspace:^1.0.0",
     "@seokit/plugin-accessibility": "workspace:*",
     "@seokit/plugin-aeo": "workspace:*",
-    "@seokit/plugin-geo": "workspace:*",
-    "@seokit/plugin-security": "workspace:*",
-    "@seokit/plugin-structured-data": "workspace:*",
-    "@seokit/critic-aeolint": "workspace:*",
     "@seokit/plugin-crux": "workspace:*",
-    "@seokit/plugin-gsc": "workspace:*"
+    "@seokit/plugin-geo": "workspace:*",
+    "@seokit/plugin-gsc": "workspace:*",
+    "@seokit/plugin-performance": "workspace:*",
+    "@seokit/plugin-security": "workspace:*",
+    "@seokit/plugin-seo": "workspace:*",
+    "@seokit/plugin-structured-data": "workspace:*",
+    "@seokit/plugins-competitive": "workspace:^",
+    "@seokit/workspace": "workspace:^1.0.0"
   }
 }

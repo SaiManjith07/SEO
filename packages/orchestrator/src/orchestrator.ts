@@ -319,20 +319,7 @@ export class VerificationOrchestrator {
       { term: 'aeo optimize strategies', volume: 880 }
     ];
 
-    const mockCompetitorKws = [
-      'seo software tools',
-      'competitor search gap analysis',
-      'backlink authority opportunities'
-    ];
-
-    const mockBacklinks = [
-      { url: 'https://highauthorityblog.com/resource', domainAuthority: 68 },
-      { url: 'https://toxicspamlink.xyz/spam', domainAuthority: 4 }
-    ];
-
     const clusters = AIIntelligenceEngine.clusterKeywords(mockKeywords);
-    const gaps = AIIntelligenceEngine.analyzeCompetitorGaps(mockKeywords.map(k => k.term), mockCompetitorKws);
-    const backlinks = AIIntelligenceEngine.auditBacklinks(mockBacklinks);
 
     // Mock verification evidences to seed recommendations
     const mockEvidences = [
@@ -343,10 +330,7 @@ export class VerificationOrchestrator {
 
     return {
       recommendations: recs,
-      clusters,
-      gaps,
-      backlinkOpportunities: backlinks.opportunities,
-      toxicLinks: backlinks.toxic
+      clusters
     };
   }
 

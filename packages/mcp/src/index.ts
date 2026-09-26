@@ -18,6 +18,15 @@ import '@seokit/plugin-aeo';
 import '@seokit/plugin-geo';
 import '@seokit/plugin-security';
 import '@seokit/plugin-structured-data';
+import '@seokit/plugin-crux';
+import '@seokit/plugin-gsc';
+import '@seokit/plugins-competitive';
+
+try {
+  // If critic-aeolint exists as a plugin, try to import it dynamically
+  // @ts-ignore
+  await import('@seokit/plugin-critic-aeolint');
+} catch (e) {}
 
 export const server = new McpServer({
   name: 'seokit-v3',
@@ -134,13 +143,10 @@ server.registerTool(
     inputSchema: {}
   },
   async () => {
-    const plugins = [
-      { id: 'seo', name: 'SEO plugin checking standard tags, canonical links, robots, sitemaps.' },
-      { id: 'performance', name: 'Performance plugin monitoring loading times, Core Web Vitals.' },
-      { id: 'accessibility', name: 'Accessibility plugin checking WCAG standards compliance.' },
-      { id: 'aeo', name: 'Answer Engine Optimization plugin grading AI summaries suitability.' },
-      { id: 'geo', name: 'Generative Engine Optimization plugin verifying geographic trust factors.' }
-    ];
+    const plugins = PluginRegistry.getAll().map(p => ({
+      id: p.id || p.manifest?.id?.replace('@seokit/plugin-', ''),
+      name: p.manifest?.description || p.manifest?.id || p.id
+    }));
     return text(JSON.stringify(plugins, null, 2));
   }
 );

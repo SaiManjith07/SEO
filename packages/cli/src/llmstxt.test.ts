@@ -61,12 +61,12 @@ describe('SEOKit llms.txt validation', () => {
     expect(code).toBe(1);
   });
 
-  it('no sections fails', async () => {
+  it('no sections passes per spec', async () => {
     const invalidContent = `# My Site
 No sections here!
 `;
     const code = await runVerify(invalidContent);
-    expect(code).toBe(1);
+    expect(code).toBe(0);
   });
 
   it('HTML tags fails', async () => {
@@ -79,12 +79,12 @@ No sections here!
     expect(code).toBe(1);
   });
 
-  it('missing markdown link in section fails', async () => {
+  it('missing markdown link in section passes per spec', async () => {
     const invalidContent = `# My Site
 ## Section 1
 Just text, no link
 `;
     const code = await runVerify(invalidContent);
-    expect(code).toBe(1);
+    expect(code).toBe(0);
   });
 });

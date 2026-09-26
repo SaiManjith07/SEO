@@ -78,4 +78,30 @@ describe('plan', () => {
     const p = plan(makeTask(['capF']));
     expect(p.totalSteps).toBe(1);
   });
+
+  it('Arbitrates between multiple agents by highest priority', () => {
+    registry.agents.register({
+      id: 'agent1',
+      version: '1',
+      capabilities: ['capAudit'],
+      priority: 1,
+      inputSchema: {} as any,
+      outputSchema: {} as any,
+      canHandle: () => true,
+      run: async () => ({} as any)
+    });
+    registry.agents.register({
+      id: 'agent5',
+      version: '1',
+      capabilities: ['capAudit'],
+      priority: 5,
+      inputSchema: {} as any,
+      outputSchema: {} as any,
+      canHandle: () => true,
+      run: async () => ({} as any)
+    });
+    const p = plan(makeTask(['capAudit']));
+    expect(p.totalSteps).toBe(1);
+    expect(p.steps[0].agentId).toBe('agent5');
+  });
 });

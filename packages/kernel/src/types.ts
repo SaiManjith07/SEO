@@ -59,6 +59,8 @@ export interface AgentResult {
 export interface Agent<TInput = any> {
   id: string;
   version: string;
+  priority?: number;
+  runAlongside?: boolean;
   capabilities: string[];
   requires?: {
     credentials?: string[];

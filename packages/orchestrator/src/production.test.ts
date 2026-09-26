@@ -339,9 +339,6 @@ describe('SEOKit v2 Comprehensive Production E2E Validation Suite', () => {
       expect(aiReport).toBeDefined();
       expect(aiReport.recommendations.length).toBe(2);
       expect(aiReport.clusters.length).toBe(2);
-      expect(aiReport.gaps.length).toBe(2);
-      expect(aiReport.backlinkOpportunities[0].domain).toBe('highauthorityblog.com');
-      expect(aiReport.toxicLinks[0].toxicScore).toBe(85);
 
       const draft = orchestrator.generateAIDraft(session.id, 'Topic Title', ['kw1', 'kw2']);
       expect(draft).toContain('# Draft: Topic Title');

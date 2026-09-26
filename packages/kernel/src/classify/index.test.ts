@@ -43,10 +43,44 @@ describe('classify', () => {
     expect(res.goal).toBe('unknown');
     expect(res.confidence).toBe('low');
     expect(res.capabilities.length).toBe(0);
+    expect(res.params.url).toBeUndefined();
   });
 
   it('returns unknown for empty input', () => {
     const res = classify('');
     expect(res.goal).toBe('unknown');
+  });
+
+  it('audit mysite.com -> url = mysite.com, confidence = inferred', () => {
+    const res = classify('audit mysite.com');
+    expect(res.params.url).toBe('mysite.com');
+    expect(res.params.urlConfidence).toBe('inferred');
+  });
+
+  it('audit https://mysite.com/path?q=1 -> url = https://mysite.com/path?q=1, confidence = explicit', () => {
+    const res = classify('audit https://mysite.com/path?q=1');
+    expect(res.params.url).toBe('https://mysite.com/path?q=1');
+    expect(res.params.urlConfidence).toBe('explicit');
+  });
+
+  it('audit www.mysite.co.uk -> url contains www.mysite.co.uk, confidence = explicit', () => {
+    const res = classify('audit www.mysite.co.uk');
+    expect(res.params.url).toBe('www.mysite.co.uk');
+    expect(res.params.urlConfidence).toBe('explicit');
+  });
+
+  it('audit example.e -> NO url param (TLD is 1 letter)', () => {
+    const res = classify('audit example.e');
+    expect(res.params.url).toBeUndefined();
+  });
+
+  it('audit e.g. something -> NO url param', () => {
+    const res = classify('audit e.g. something');
+    expect(res.params.url).toBeUndefined();
+  });
+
+  it('check core web vitals on staging.example.com -> url = staging.example.com', () => {
+    const res = classify('check core web vitals on staging.example.com');
+    expect(res.params.url).toBe('staging.example.com');
   });
 });
