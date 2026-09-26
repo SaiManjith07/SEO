@@ -7,6 +7,11 @@ export class CruxCredentialsMissingError extends Error {
   }
 }
 
+// Minimal polyfill because crux-api reads window.fetch directly, which crashes in Node.
+if (typeof window === 'undefined') {
+  (global as any).window = { fetch: globalThis.fetch };
+}
+
 export class CruxPlugin {
   private query: any;
 

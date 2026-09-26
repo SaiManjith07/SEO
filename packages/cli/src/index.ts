@@ -43,7 +43,8 @@ export async function main() {
           fs.mkdirSync(outPath, { recursive: true });
         }
         const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-        execSync(`${npxCmd} llmstxt-kit init`, { stdio: 'inherit', cwd: outPath });
+        execSync(`${npxCmd} -y llmstxt-kit init`, { stdio: 'inherit', cwd: outPath });
+        execSync(`${npxCmd} -y llmstxt-kit build`, { stdio: 'inherit', cwd: outPath });
       } catch (err: any) {
         console.error('Failed to generate llms.txt:', err.message);
       }
@@ -353,14 +354,48 @@ Usage:
         verifyPath = path.dirname(verifyPath);
       }
     }
-    console.log('[SEOKit] Validating llms.txt via llmstxt-kit...');
-    const { execSync } = await import('child_process');
+    console.log('[SEOKit] Validating llms.txt internally...');
     try {
-      const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-      execSync(`${npxCmd} llmstxt-kit validate --json`, { stdio: 'inherit', cwd: verifyPath });
+      const llmsPath = path.join(verifyPath, 'llms.txt');
+      if (!fs.existsSync(llmsPath)) {
+        console.error(`✗ Validation failed: llms.txt not found at ${llmsPath}`);
+        process.exit(1);
+      }
+      
+      const content = fs.readFileSync(llmsPath, 'utf8');
+      
+      // Basic checks
+      if (!content) {
+        console.error('✗ Validation failed: file is empty');
+        process.exit(1);
+      }
+      
+      if (!/^#\s+.+/m.test(content)) {
+        console.error('✗ Validation failed: missing H1 title');
+        process.exit(1);
+      }
+      
+      const h2Sections = content.split(/^##\s+.+$/m).slice(1);
+      if (h2Sections.length === 0) {
+        console.error('✗ Validation failed: missing H2 sections');
+        process.exit(1);
+      }
+      
+      for (const section of h2Sections) {
+        if (!/\[.*?\]\(.*?\)/.test(section)) {
+          console.error('✗ Validation failed: found section missing a markdown link');
+          process.exit(1);
+        }
+      }
+      
+      if (/<[a-z][\s\S]*>/i.test(content)) {
+        console.error('✗ Validation failed: contains HTML tags');
+        process.exit(1);
+      }
+      
       console.log('✓ llms.txt is valid!');
     } catch (err: any) {
-      console.error('✗ llms.txt validation failed.');
+      console.error('✗ llms.txt validation failed: ' + err.message);
       process.exit(1);
     }
     process.exit(0);
