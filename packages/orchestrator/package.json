@@ -1,7 +1,7 @@
 {
   "name": "@seokit/orchestrator",
   "version": "",
-  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "Multi-agent coordination orchestrator for SEO/AEO/GEO/LLMO automation.",
   "type": "module",
   "bin": {

@@ -1,7 +1,7 @@
 {
   "name": "@seokit/parser",
   "version": "",
-  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Resource and DOM Parser Pipeline.",
   "type": "module",
   "main": "./dist/index.js",

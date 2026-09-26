@@ -1,7 +1,7 @@
 {
   "name": "@seokit/diagnostics",
   "version": "",
-  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Diagnostics translation layer.",
   "type": "module",
   "main": "./dist/index.js",

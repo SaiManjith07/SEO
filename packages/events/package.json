@@ -1,7 +1,7 @@
 {
   "name": "@seokit/events",
   "version": "",
-  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
+  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
   "description": "SEOKit Central Platform Event Bus.",
   "type": "module",
   "main": "./dist/index.js",
