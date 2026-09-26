@@ -1,7 +1,7 @@
 {
   "name": "@seokit/framework-detector",
   "version": "",
-  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
+  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
   "description": "SEOKit Framework Intelligence Detector.",
   "type": "module",
   "main": "./dist/index.js",

@@ -638,3 +638,12 @@ No silent deviations occurred.
 - git ls-files packages/kernel count: 31 files.
 - **Branch Pushed To:** main
 - **Secrets Tracking:** No .env, service-account, or .pem files are tracked.
+
+## 13. Repo Audit Fixes
+
+- **Competitive Plugin:** Committed packages/plugins/competitive/ (sitemap diff + entity presence).
+- **Tools Decision:** Vendored the Librecrawl MCP server inside 	ools/librecrawl, but explicitly gitignored its .venv/ and __pycache__/ to keep the repo clean without requiring an external clone.
+- **Debug Artifacts:** Removed untracked files dummy.json, mcp-handshake.js, and 	est-mcp.js.
+- **Branch Canonicalization:** Verified main as the active branch and deleted the dead master branch both locally and on origin.
+- **Module Deviation (eport/ and 	race/ deferral):** The implementation of packages/kernel/src/report/ (json/md/html emitters) and packages/kernel/src/trace/ (execution trace writer) was intentionally deferred to Step 4. Step 4 is explicitly scheduled to handle the "executor + merger + report emitters", so these modules belong naturally in that phase rather than Step 3.
+

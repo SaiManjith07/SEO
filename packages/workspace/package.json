@@ -1,7 +1,7 @@
 {
   "name": "@seokit/workspace",
   "version": "",
-  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
+  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
   "description": "SEOKit Workspace Management and project lifecycles.",
   "type": "module",
   "main": "./dist/index.js",

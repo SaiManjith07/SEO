@@ -2,7 +2,7 @@
   "name": "seokit-monorepo",
   "private": true,
   "version": "1.0.0",
-  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
+  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
   "description": "Build-time SEO tooling for AI-era search. One rule engine, many adapters.",
   "scripts": {
     "build": "pnpm -r build",

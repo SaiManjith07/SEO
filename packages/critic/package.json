@@ -1,7 +1,7 @@
 {
   "name": "@seokit/critic",
   "version": "",
-  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
+  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
   "description": "Independent SEO/GEO verification against published benchmarks. Emits a reward signal.",
   "type": "module",
   "main": "./dist/index.js",

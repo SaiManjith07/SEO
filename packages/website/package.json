@@ -1,7 +1,7 @@
 {
   "name": "@seokit/website",
   "version": "",
-  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
+  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
   "description": "SEOKit Canonical Website and Page Models.",
   "type": "module",
   "main": "./dist/index.js",

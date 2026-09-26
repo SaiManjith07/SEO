@@ -1,7 +1,7 @@
 {
   "name": "@seokit/critic-aeolint",
   "version": "",
-  "author": "Nabhi Labs Studio (Organisation: Nabhi Labs)",
+  "author": "Pavan Kumar Kunukuntla <pavankumarnabhilabs@gmail.com> (Nabhi Labs Studio)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
