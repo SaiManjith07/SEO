@@ -588,3 +588,53 @@ No silent deviations occurred.
 ## 10. Step 4 Readiness
 
 **READY** — Validators hardened, engine tested, classifier + planner built and integrated natively, credential resolution actively deriving from classified tasks. No blockers. Ready for Execution and Merger.
+
+## 11. Post-Review Fixes
+
+### Defect 1: URL Extraction
+**Description:** The URL extraction logic in the classifier was primitive and could extract single-letter TLDs or incorrect substrings.
+**Fix Applied:** Introduced a COMMON_TLDS set, regex prioritization (explicit scheme -> www -> bare domain -> for <domain>), and added urlConfidence. 
+**Tests Added:**
+- udit mysite.com -> inferred
+- udit https://mysite.com/path?q=1 -> explicit
+- udit www.mysite.co.uk -> explicit
+- udit example.e -> rejected (1 letter TLD)
+- udit e.g. something -> rejected
+- check core web vitals on staging.example.com -> staging.example.com
+- purple monkey dishwasher -> undefined url
+
+**Raw Vitest Output:**
+``
+ ? src/classify/index.test.ts (11 tests) 12ms
+``
+
+### Defect 2: Agent Arbitration
+**Description:** The planner didn't arbitrate between multiple agents providing the same capability deterministically based on priority.
+**Fix Applied:** Added priority?: number and unAlongside?: boolean to the Agent interface. Sorted matching agents by priority descending, then alphabetically by id. Picked the first agent (and any marked unAlongside).
+**Tests Added:**
+- Added two agents for capAudit with priorities 1 and 5.
+- Verified that a task with capAudit produces exactly 1 step using gent5.
+
+**Raw Vitest Output:**
+``
+ ? src/plan/index.test.ts (7 tests) 12ms
+``
+
+### Defect 3: Credential Test Isolation
+**Description:** Credential tests were bundled into a single it block and manipulated the global process.env improperly, risking test pollution.
+**Fix Applied:** Wrapped the credential tests in a describe block. Used eforeEach to set up agents and fterEach to explicitly delete process.env.CRUX_API_KEY and delete process.env.GSC_SERVICE_ACCOUNT_PATH.
+**Tests Added (Split):**
+- 'performance task without CRUX_API_KEY rejects with /CRUX_API_KEY/'
+- 'rank task without GSC creds rejects with /GSC_SERVICE_ACCOUNT_PATH/ and NOT /CRUX_API_KEY/'
+- 'performance task with CRUX_API_KEY builds a plan with perf-agent'
+
+**Raw Vitest Output:**
+``
+ ? src/index.test.ts (4 tests) 13ms
+``
+
+## 12. GitHub Push Verification
+- git log --oneline -5 Output provided.
+- git ls-files packages/kernel count: 31 files.
+- **Branch Pushed To:** main
+- **Secrets Tracking:** No .env, service-account, or .pem files are tracked.
